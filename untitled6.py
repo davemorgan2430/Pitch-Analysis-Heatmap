@@ -15,8 +15,6 @@ import streamlit as st
 # Streamlit app title
 st.title("Pitch Analysis Heatmap")
 
-1lUKCYNnWi02NA6ICynEGrjsH1uqJeSH7
-
 # Input the Google Drive file ID
 file_id = "1lUKCYNnWi02NA6ICynEGrjsH1uqJeSH7"  # Replace with your Google Drive file ID
 url = f"https://drive.google.com/uc?id={file_id}"
