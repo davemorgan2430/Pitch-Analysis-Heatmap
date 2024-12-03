@@ -16,7 +16,7 @@ import streamlit as st
 st.title("Pitch Analysis Heatmap")
 
 # CSV uploader
-uploaded_file = st.file_uploader("/content/angle.csv", type="csv")
+uploaded_file = st.file_uploader("angle.csv", type="csv")
 
 if uploaded_file is not None:
     # Read the CSV file into a DataFrame
@@ -82,8 +82,8 @@ if uploaded_file is not None:
     )
 
     # Add lines at x=0 and y=0
-    plt.axhline(0, color='red', linestyle='--', linewidth=1, label='y=0')  # Horizontal line
-    plt.axvline(0, color='blue', linestyle='--', linewidth=1, label='x=0')  # Vertical line
+    plt.axhline(0, color='black', linestyle='--', linewidth=1, label='y=0')  # Horizontal line
+    plt.axvline(0, color='black', linestyle='--', linewidth=1, label='x=0')  # Vertical line
 
     # Highlight the selected pitcher's average data point
     plt.scatter(
