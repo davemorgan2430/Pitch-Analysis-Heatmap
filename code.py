@@ -14,7 +14,6 @@ url = f"https://drive.google.com/uc?id={file_id}"
 try:
     df = pd.read_csv(url)
     st.write("Data loaded successfully!")
-    st.write(df.head())  # Display the first few rows
 except Exception as e:
     st.error("Error loading the file. Please check the file ID or format.")
     st.error(e)
@@ -50,11 +49,9 @@ if filtered_df.empty:
 
 # List pitchers in the filtered range
 pitchers_in_range = filtered_df['player_name'].unique()
-st.write("Pitchers in the selected arm angle range:")
-st.write(", ".join(pitchers_in_range))
 
 # Ask the user to select a pitcher
-selected_pitcher = st.selectbox("Select a pitcher to highlight", pitchers_in_range)
+selected_pitcher = st.selectbox("Select a pitcher in range to highlight", pitchers_in_range)
 
 # Filter the data for the selected pitcher and calculate average HB and iVB
 pitcher_data = filtered_df[filtered_df['player_name'] == selected_pitcher]
