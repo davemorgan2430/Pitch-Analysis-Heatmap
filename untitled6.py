@@ -38,8 +38,8 @@ selected_handedness = st.selectbox(
 # Filter the DataFrame based on user input
 filtered_df = df[
     (df['pitch_type'] == selected_pitch) &
-    (df['arm_angle'] >= arm_angle_range[0]) &
-    (df['arm_angle'] <= arm_angle_range[1]) &
+    (df['arm_angle'] >= min_arm_angle) &
+    (df['arm_angle'] <= max_arm_angle) &
     (df['p_throws'] == selected_handedness)
 ]
 
@@ -90,7 +90,7 @@ plt.scatter(
 )
 
 # Set labels and title
-plt.title(f"{selected_pitch} | {selected_handedness}-handed | Arm Angle: {arm_angle_range[0]:.1f}° - {arm_angle_range[1]:.1f}°", fontsize=16)
+plt.title(f"{selected_pitch} | {selected_handedness}-handed | Arm Angle: {min_arm_angle:.1f}° - {max_arm_angle:.1f}°", fontsize=16)
 plt.xlabel("Horizontal Break (HB)", fontsize=14)
 plt.ylabel("Induced Vertical Break (iVB)", fontsize=14)
 
