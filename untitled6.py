@@ -32,10 +32,10 @@ except Exception as e:
 # Add more Streamlit inputs and visualizations below as needed
 
     # Streamlit user inputs for filtering
-    selected_pitch = st.selectbox("Select the pitch type", aa['pitch_type'].unique())
+    selected_pitch = st.selectbox("Select the pitch type", df['pitch_type'].unique())
 
     # Ask for the arm angle range
-    min_arm_angle, max_arm_angle = aa['arm_angle'].min(), aa['arm_angle'].max()
+    min_arm_angle, max_arm_angle = df['arm_angle'].min(), df['arm_angle'].max()
     arm_angle_range = st.slider(
         "Select arm angle range",
         min_value=float(min_arm_angle),
@@ -46,15 +46,15 @@ except Exception as e:
     # Ask for handedness
     selected_handedness = st.selectbox(
         "Select handedness",
-        aa['p_throws'].unique()
+        df['p_throws'].unique()
     )
 
     # Filter the DataFrame based on user input
-    filtered_df = aa[
-        (aa['pitch_type'] == selected_pitch) &
-        (aa['arm_angle'] >= arm_angle_range[0]) &
-        (aa['arm_angle'] <= arm_angle_range[1]) &
-        (aa['p_throws'] == selected_handedness)
+    filtered_df = df[
+        (df['pitch_type'] == selected_pitch) &
+        (df['arm_angle'] >= arm_angle_range[0]) &
+        (df['arm_angle'] <= arm_angle_range[1]) &
+        (df['p_throws'] == selected_handedness)
     ]
 
     # Print the pitchers in the filtered arm angle range
