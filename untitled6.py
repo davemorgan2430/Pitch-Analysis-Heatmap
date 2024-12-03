@@ -7,48 +7,6 @@ Original file is located at
     https://colab.research.google.com/drive/1CPPnqXoEimcrm_Nf137HYMSX-jOrHjse
 """
 
-!pip install streamlit
-
-from google.colab import drive
-drive.mount('/content/drive')
-
-import pandas as pd
-
-df1 = pd.read_csv('/content/drive/MyDrive/Statcast data/statcast_data.csv')
-
-pd.set_option('display.max_columns', None)
-
-df1.head(5)
-
-# Group by player name and pitch type, then calculate the average of relevant columns
-angle = df1.groupby(['player_name', 'pitch_type', 'p_throws'])[['arm_angle', 'release_speed', 'release_spin_rate', 'release_pos_x', 'release_pos_z', 'iVB', 'HB', 'release_extension', 'estimated_woba_using_speedangle']].mean()
-
-angle
-
-# Group by player name and pitch type, then calculate the average of relevant columns
-angle = df1.groupby(['player_name', 'pitch_type', 'p_throws'])[['arm_angle', 'release_speed', 'release_spin_rate', 'release_pos_x', 'release_pos_z', 'iVB', 'HB', 'release_extension', 'estimated_woba_using_speedangle']].mean()
-
-# Reset the index to convert the grouped columns back into regular columns
-angle = angle.reset_index()
-
-angle
-
-# prompt: round arm_angle in angle df to whole number
-
-# Replace NaN values with a suitable integer (e.g., 0) before conversion
-angle['arm_angle'] = angle['arm_angle'].fillna(0).round(0).astype(int)
-angle
-
-# prompt: save angle df as csv and to drive
-
-# Save the DataFrame to a CSV file in the current working directory
-angle.to_csv('angle.csv', index=False)
-
-# Save the DataFrame to a CSV file in your Google Drive
-angle.to_csv('/content/drive/MyDrive/Statcast data/angle.csv', index=False)
-
-
-
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
