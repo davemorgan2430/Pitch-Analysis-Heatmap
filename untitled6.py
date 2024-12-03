@@ -23,14 +23,11 @@ except Exception as e:
 # Streamlit user inputs for filtering
 selected_pitch = st.selectbox("Select the pitch type", df['pitch_type'].unique())
 
-# Ask for the arm angle range
-min_arm_angle, max_arm_angle = df['arm_angle'].min(), df['arm_angle'].max()
-arm_angle_range = st.slider(
-    "Select arm angle range",
-    min_value=float(min_arm_angle),
-    max_value=float(max_arm_angle),
-    value=(float(min_arm_angle), float(max_arm_angle))
-)
+# Ask for the arm angle range (manual input for minimum and maximum values)
+min_arm_angle = st.number_input("Enter the minimum arm angle", min_value=float(df['arm_angle'].min()), 
+                                max_value=float(df['arm_angle'].max()), value=float(df['arm_angle'].min()))
+max_arm_angle = st.number_input("Enter the maximum arm angle", min_value=float(df['arm_angle'].min()), 
+                                max_value=float(df['arm_angle'].max()), value=float(df['arm_angle'].max()))
 
 # Ask for handedness
 selected_handedness = st.selectbox(
