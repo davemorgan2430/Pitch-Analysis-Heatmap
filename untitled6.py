@@ -49,7 +49,7 @@ if uploaded_file is not None:
     ]
 
     # Print the pitchers in the filtered arm angle range
-    pitchers_in_range = filtered_df['pitcher_name'].unique()
+    pitchers_in_range = filtered_df['player_name'].unique()
     if len(pitchers_in_range) > 0:
         st.write("Pitchers in the selected arm angle range:")
         for pitcher in pitchers_in_range:
@@ -62,7 +62,7 @@ if uploaded_file is not None:
     selected_pitcher = st.selectbox("Select a pitcher to highlight", pitchers_in_range)
 
     # Filter the data for the selected pitcher and calculate average HB and iVB
-    pitcher_data = filtered_df[filtered_df['pitcher_name'] == selected_pitcher]
+    pitcher_data = filtered_df[filtered_df['player_name'] == selected_pitcher]
     average_hb = pitcher_data['HB'].mean()
     average_ivb = pitcher_data['iVB'].mean()
 
@@ -93,9 +93,6 @@ if uploaded_file is not None:
         s=100,
         label=f"{selected_pitcher} (Avg HB: {average_hb:.2f}, Avg iVB: {average_ivb:.2f})"
     )
-
-    # Add legend for the lines and point
-    plt.legend(loc='upper right')
 
     # Set labels and title
     plt.title(f"{selected_pitch} | {selected_handedness}-handed | Arm Angle: {arm_angle_range[0]:.1f}° - {arm_angle_range[1]:.1f}°", fontsize=16)
