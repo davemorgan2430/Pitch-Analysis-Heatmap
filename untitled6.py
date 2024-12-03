@@ -15,12 +15,23 @@ import streamlit as st
 # Streamlit app title
 st.title("Pitch Analysis Heatmap")
 
-# CSV uploader
-uploaded_file = st.file_uploader("angle.csv", type="csv")
+1lUKCYNnWi02NA6ICynEGrjsH1uqJeSH7
 
-if uploaded_file is not None:
-    # Read the CSV file into a DataFrame
-    aa = pd.read_csv(uploaded_file)
+# Input the Google Drive file ID
+file_id = "1lUKCYNnWi02NA6ICynEGrjsH1uqJeSH7"  # Replace with your Google Drive file ID
+url = f"https://drive.google.com/uc?id={file_id}"
+
+# Load the CSV file into a DataFrame
+try:
+    df = pd.read_csv(url)
+    st.write("Data loaded successfully!")
+    st.write(df.head())  # Display the first few rows
+except Exception as e:
+    st.error("Error loading the file. Please check the file ID or format.")
+    st.error(e)
+
+# Now you can use the DataFrame `df` for your heatmap analysis.
+# Add more Streamlit inputs and visualizations below as needed
 
     # Streamlit user inputs for filtering
     selected_pitch = st.selectbox("Select the pitch type", aa['pitch_type'].unique())
