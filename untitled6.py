@@ -135,6 +135,7 @@ st.pyplot(plt)
 st.header("Create Your Own Pitcher")
 
 # User inputs for creating a new pitcher
+custom_pitch_type = st.selectbox("Select the pitch type for your pitcher", df['pitch_type'].unique())
 custom_ivb = st.number_input("Enter induced Vertical Break (iVB)", min_value=-30.0, max_value=30.0, value=0.0)
 custom_hb = st.number_input("Enter Horizontal Break (HB)", min_value=-30.0, max_value=30.0, value=0.0)
 custom_handedness = st.selectbox("Select handedness for your pitcher", ['L', 'R'])
@@ -145,12 +146,18 @@ custom_arm_angle = st.number_input(
     value=float(avg_arm_angle),
 )
 
-# Filter the dataset for all pitchers with the selected arm angle
-custom_filtered_df = pitch_filtered_df[pitch_filtered_df['arm_angle'] == custom_arm_angle]
+# Filter the dataset for all pitchers with the selected pitch type and arm angle
+custom_filtered_df = pitch_filtered_df[
+    (pitch_filtered_df['arm_angle'] == custom_arm_angle) &
+    (pitch_filtered_df['pitch_type'] == custom_pitch_type)
+]
 
 # Check if there are matches
 if custom_filtered_df.empty:
-    st.warning(f"No pitchers found with an arm angle of {custom_arm_angle:.2f}°. Heatmap won't include other data.")
+    st.warning(
+        f"No pitchers found with an arm angle of {custom_arm_angle:.2f}° and pitch type {custom_pitch_type}. "
+        "Heatmap won't include other data."
+    )
 else:
     # Overlay custom pitcher on the heatmap
     plt.figure(figsize=(10, 8))
@@ -180,7 +187,7 @@ else:
         custom_ivb,
         color='blue',
         s=100,
-        label=f"Custom Pitcher (HB: {custom_hb:.2f}, iVB: {custom_ivb:.2f}, Arm Angle: {custom_arm_angle:.2f}°)"
+        label=f"Custom Pitcher (HB: {custom_hb:.2f}, iVB: {custom_ivb:.2f}, Arm Angle: {custom_arm_angle:.2f}°, Pitch Type: {custom_pitch_type})"
     )
 
     # Add lines at x=0 and y=0
@@ -188,7 +195,10 @@ else:
     plt.axvline(0, color='black', linestyle='--', linewidth=1, label='x=0')
 
     # Set labels and title
-    plt.title(f"Heatmap with Custom Pitcher | Arm Angle: {custom_arm_angle:.2f}°", fontsize=16)
+    plt.title(
+        f"Heatmap with Custom Pitcher | Pitch Type: {custom_pitch_type} | Arm Angle: {custom_arm_angle:.2f}°",
+        fontsize=16
+    )
     plt.xlabel("Horizontal Break (HB)", fontsize=14)
     plt.ylabel("Induced Vertical Break (iVB)", fontsize=14)
 
