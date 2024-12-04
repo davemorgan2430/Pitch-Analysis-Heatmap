@@ -34,6 +34,12 @@ selected_pitch = st.selectbox("Select the pitch type", df['pitch_type'].unique()
 # Filter DataFrame by selected pitch type
 pitch_filtered_df = df[df['pitch_type'] == selected_pitch]
 
+# Step 4: User selects handedness
+selected_handedness = st.selectbox(
+    "Select handedness",
+    df['p_throws'].unique()
+)
+
 # Step 2: Select pitcher
 available_pitchers = pitch_filtered_df['player_name'].unique()
 selected_pitcher = st.selectbox("Select a pitcher", available_pitchers)
@@ -71,12 +77,6 @@ input_arm_angle = st.number_input(
     min_value=float(df['arm_angle'].min()),
     max_value=float(df['arm_angle'].max()),
     value=float(avg_arm_angle),
-)
-
-# Step 4: User selects handedness
-selected_handedness = st.selectbox(
-    "Select handedness",
-    df['p_throws'].unique()
 )
 
 # Filter data based on user input
