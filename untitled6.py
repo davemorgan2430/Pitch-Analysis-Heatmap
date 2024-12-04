@@ -20,7 +20,7 @@ except Exception as e:
     st.stop()
 
 # Validate required columns
-required_columns = ['pitch_type', 'player_name', 'arm_angle', 'HB', 'iVB', 'p_throws', 'velo', 'spin_rate', 'wOBA', 'extension']
+required_columns = ['pitch_type', 'player_name', 'arm_angle', 'HB', 'iVB', 'p_throws', 'release_speed', 'release_spin_rate', 'estimated_woba_using_speedangle', 'release_extension']
 if not all(col in df.columns for col in required_columns):
     st.error(
         "The uploaded file is missing required columns. Ensure it contains: "
