@@ -51,7 +51,6 @@ avg_velocity = pitcher_data['release_speed'].mean()
 avg_spin_rate = pitcher_data['release_spin_rate'].mean()
 avg_woba = pitcher_data['estimated_woba_using_speedangle'].mean()
 avg_extension = pitcher_data['release_extension'].mean()
-total_pitches = len(pitcher_data)
 
 # Sidebar: Display pitcher stats
 st.sidebar.header(f"{selected_pitcher} - Pitch Stats")
