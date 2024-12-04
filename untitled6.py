@@ -60,7 +60,6 @@ st.sidebar.write(f"**Average Velocity:** {avg_velocity:.1f} mph")
 st.sidebar.write(f"**Average Spin Rate:** {avg_spin_rate:.1f} rpm")
 st.sidebar.write(f"**Average wOBA:** {avg_woba:.3f}")
 st.sidebar.write(f"**Average Extension:** {avg_extension:.2f} ft")
-st.sidebar.write(f"**Total Pitches:** {total_pitches}")
 
 # Step 3: User inputs arm angle
 input_arm_angle = st.number_input(
