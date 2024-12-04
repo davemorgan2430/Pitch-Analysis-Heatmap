@@ -51,6 +51,8 @@ avg_velocity = pitcher_data['release_speed'].mean()
 avg_spin_rate = pitcher_data['release_spin_rate'].mean()
 avg_woba = pitcher_data['estimated_woba_using_speedangle'].mean()
 avg_extension = pitcher_data['release_extension'].mean()
+avg_iVB = pitcher_data['iVB'].mean()
+avg_HB = pitcher_data['HB'].mean()
 
 # Sidebar: Display pitcher stats
 st.sidebar.header(f"{selected_pitcher} - Pitch Stats")
@@ -60,6 +62,8 @@ st.sidebar.write(f"**Average Velocity:** {avg_velocity:.1f} mph")
 st.sidebar.write(f"**Average Spin Rate:** {avg_spin_rate:.1f} rpm")
 st.sidebar.write(f"**Average wOBA:** {avg_woba:.3f}")
 st.sidebar.write(f"**Average Extension:** {avg_extension:.2f} ft")
+st.sidebar.write(f"**Average iVB:** {avg_iVB:.2f} in")
+st.sidebar.write(f"**Average HB:** {avg_HB:.2f} in")
 
 # Step 3: User inputs arm angle
 input_arm_angle = st.number_input(
