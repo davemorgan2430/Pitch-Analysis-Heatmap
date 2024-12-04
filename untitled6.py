@@ -204,5 +204,10 @@ else:
     plt.xlabel("Horizontal Break (HB)", fontsize=14)
     plt.ylabel("Induced Vertical Break (iVB)", fontsize=14)
 
+# Set x and y axis limits
+plt.xlim(-30, 30)
+plt.ylim(-30, 30)
+
+    
     # Show the plot in Streamlit
     st.pyplot(plt)
