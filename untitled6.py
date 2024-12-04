@@ -20,11 +20,11 @@ except Exception as e:
     st.stop()
 
 # Validate required columns
-required_columns = ['pitch_type', 'player_name', 'arm_angle', 'HB', 'iVB', 'p_throws']
+required_columns = ['pitch_type', 'player_name', 'arm_angle', 'HB', 'iVB', 'p_throws', 'velo', 'spin_rate', 'wOBA', 'extension']
 if not all(col in df.columns for col in required_columns):
     st.error(
         "The uploaded file is missing required columns. Ensure it contains: "
-        "pitch_type, player_name, arm_angle, HB, iVB, p_throws."
+        "pitch_type, player_name, arm_angle, HB, iVB, p_throws, velo, spin_rate, wOBA, extension."
     )
     st.stop()
 
@@ -45,9 +45,23 @@ if pitcher_data.empty:
     st.warning("No data found for the selected pitcher.")
     st.stop()
 
-# Calculate and display the selected pitcher's average arm angle
+# Calculate and display the selected pitcher's average stats
 avg_arm_angle = pitcher_data['arm_angle'].mean()
-st.write(f"Average Arm Angle for {selected_pitcher}: {avg_arm_angle:.2f}°")
+avg_velocity = pitcher_data['release_speed'].mean()
+avg_spin_rate = pitcher_data['release_spin_rate'].mean()
+avg_woba = pitcher_data['estimated_woba_using_speedangle'].mean()
+avg_extension = pitcher_data['release_extension'].mean()
+total_pitches = len(pitcher_data)
+
+# Sidebar: Display pitcher stats
+st.sidebar.header(f"{selected_pitcher} - Pitch Stats")
+st.sidebar.write(f"**Pitch Type:** {selected_pitch}")
+st.sidebar.write(f"**Average Arm Angle:** {avg_arm_angle:.2f}°")
+st.sidebar.write(f"**Average Velocity:** {avg_velocity:.1f} mph")
+st.sidebar.write(f"**Average Spin Rate:** {avg_spin_rate:.1f} rpm")
+st.sidebar.write(f"**Average wOBA:** {avg_woba:.3f}")
+st.sidebar.write(f"**Average Extension:** {avg_extension:.2f} ft")
+st.sidebar.write(f"**Total Pitches:** {total_pitches}")
 
 # Step 3: User inputs arm angle
 input_arm_angle = st.number_input(
@@ -110,6 +124,7 @@ plt.ylabel("Induced Vertical Break (iVB)", fontsize=14)
 # Set x and y axis limits
 plt.xlim(-30, 30)
 plt.ylim(-30, 30)
+
 
 # Display the plot in Streamlit
 st.pyplot(plt)
