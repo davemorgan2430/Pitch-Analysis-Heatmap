@@ -143,7 +143,7 @@ import matplotlib.pyplot as plt
 import streamlit as st
 
 # Streamlit app title
-st.title("Pitch Analysis Heatmap")
+st.title("Create Custome Pitcher")
 
 # Input the Google Drive file ID
 file_id = "1lUKCYNnWi02NA6ICynEGrjsH1uqJeSH7"  # Replace with your Google Drive file ID
@@ -172,8 +172,6 @@ if not all(col in df.columns for col in required_columns):
     )
     st.stop()
 
-# --- New Section: Create Custom Pitcher ---
-st.subheader("Create Custom Pitcher")
 
 # Step 1: Select pitch type
 new_selected_pitch = st.selectbox("Select the pitch type for your custom pitcher", df['pitch_type'].unique())
