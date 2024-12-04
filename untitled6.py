@@ -19,49 +19,62 @@ except Exception as e:
     st.error(e)
     st.stop()
 
-# Streamlit user inputs for filtering
+# Validate required columns
+required_columns = ['pitch_type', 'player_name', 'arm_angle', 'HB', 'iVB', 'p_throws']
+if not all(col in df.columns for col in required_columns):
+    st.error(
+        "The uploaded file is missing required columns. Ensure it contains: "
+        "pitch_type, player_name, arm_angle, HB, iVB, p_throws."
+    )
+    st.stop()
+
+# Step 1: Select pitch type
 selected_pitch = st.selectbox("Select the pitch type", df['pitch_type'].unique())
 
-# Ask for the arm angle range (manual input for minimum and maximum values)
-min_arm_angle = st.number_input("Enter the minimum arm angle", min_value=float(df['arm_angle'].min()), 
-                                max_value=float(df['arm_angle'].max()), value=float(df['arm_angle'].min()))
-max_arm_angle = st.number_input("Enter the maximum arm angle", min_value=float(df['arm_angle'].min()), 
-                                max_value=float(df['arm_angle'].max()), value=float(df['arm_angle'].max()))
+# Filter DataFrame by selected pitch type
+pitch_filtered_df = df[df['pitch_type'] == selected_pitch]
 
-# Ask for handedness
+# Step 2: Select pitcher
+available_pitchers = pitch_filtered_df['player_name'].unique()
+selected_pitcher = st.selectbox("Select a pitcher", available_pitchers)
+
+# Filter data for the selected pitcher
+pitcher_data = pitch_filtered_df[pitch_filtered_df['player_name'] == selected_pitcher]
+
+if pitcher_data.empty:
+    st.warning("No data found for the selected pitcher.")
+    st.stop()
+
+# Calculate and display the selected pitcher's average arm angle
+avg_arm_angle = pitcher_data['arm_angle'].mean()
+st.write(f"Average Arm Angle for {selected_pitcher}: {avg_arm_angle:.2f}°")
+
+# Step 3: User inputs arm angle
+input_arm_angle = st.number_input(
+    "Enter an arm angle to filter the data (default is the pitcher's average):",
+    min_value=float(df['arm_angle'].min()),
+    max_value=float(df['arm_angle'].max()),
+    value=float(avg_arm_angle),
+)
+
+# Step 4: User selects handedness
 selected_handedness = st.selectbox(
     "Select handedness",
     df['p_throws'].unique()
 )
 
-# Filter the DataFrame based on user input
-filtered_df = df[
-    (df['pitch_type'] == selected_pitch) &
-    (df['arm_angle'] >= min_arm_angle) &
-    (df['arm_angle'] <= max_arm_angle) &
-    (df['p_throws'] == selected_handedness)
+# Filter data based on user input
+filtered_df = pitch_filtered_df[
+    (pitch_filtered_df['arm_angle'] == input_arm_angle) &
+    (pitch_filtered_df['p_throws'] == selected_handedness)
 ]
 
-# Check if there are pitchers in the filtered range
 if filtered_df.empty:
     st.warning("No data matches the selected criteria. Please adjust your filters.")
     st.stop()
 
-# List pitchers in the filtered range
-pitchers_in_range = filtered_df['player_name'].unique()
-
-# Ask the user to select a pitcher
-selected_pitcher = st.selectbox("Select a pitcher in range to highlight", pitchers_in_range)
-
-# Filter the data for the selected pitcher and calculate average HB and iVB
-pitcher_data = filtered_df[filtered_df['player_name'] == selected_pitcher]
-average_hb = pitcher_data['HB'].mean()
-average_ivb = pitcher_data['iVB'].mean()
-
-# Create a KDE plot with iVB and HB
+# Create a KDE heatmap with HB and iVB
 plt.figure(figsize=(10, 8))
-
-# Kernel Density Estimate plot
 sns.kdeplot(
     data=filtered_df,
     x='HB',
@@ -73,11 +86,10 @@ sns.kdeplot(
     cbar=True,       # Add color bar
 )
 
-# Add lines at x=0 and y=0
-plt.axhline(0, color='black', linestyle='--', linewidth=1, label='y=0')  # Horizontal line
-plt.axvline(0, color='black', linestyle='--', linewidth=1, label='x=0')  # Vertical line
+# Highlight the selected pitcher's average HB and iVB
+average_hb = pitcher_data['HB'].mean()
+average_ivb = pitcher_data['iVB'].mean()
 
-# Highlight the selected pitcher's average data point
 plt.scatter(
     average_hb,
     average_ivb,
@@ -86,14 +98,14 @@ plt.scatter(
     label=f"{selected_pitcher} (Avg HB: {average_hb:.2f}, Avg iVB: {average_ivb:.2f})"
 )
 
+# Add lines at x=0 and y=0
+plt.axhline(0, color='black', linestyle='--', linewidth=1, label='y=0')  # Horizontal line
+plt.axvline(0, color='black', linestyle='--', linewidth=1, label='x=0')  # Vertical line
+
 # Set labels and title
-plt.title(f"{selected_pitch} | {selected_handedness}-handed | Arm Angle: {min_arm_angle:.1f}° - {max_arm_angle:.1f}°", fontsize=16)
+plt.title(f"{selected_pitch} Heatmap | Arm Angle: {input_arm_angle:.2f}°", fontsize=16)
 plt.xlabel("Horizontal Break (HB)", fontsize=14)
 plt.ylabel("Induced Vertical Break (iVB)", fontsize=14)
-
-# Set x and y axis limits
-plt.xlim(-30, 30)
-plt.ylim(-30, 30)
 
 # Display the plot in Streamlit
 st.pyplot(plt)
