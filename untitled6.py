@@ -130,3 +130,67 @@ plt.ylim(-30, 30)
 
 # Display the plot in Streamlit
 st.pyplot(plt)
+
+# Step 5: Create your own pitcher feature
+st.header("Create Your Own Pitcher")
+
+# User inputs for creating a new pitcher
+custom_ivb = st.number_input("Enter induced Vertical Break (iVB)", min_value=-30.0, max_value=30.0, value=0.0)
+custom_hb = st.number_input("Enter Horizontal Break (HB)", min_value=-30.0, max_value=30.0, value=0.0)
+custom_handedness = st.selectbox("Select handedness for your pitcher", ['L', 'R'])
+custom_arm_angle = st.number_input(
+    "Enter arm angle for your pitcher",
+    min_value=float(df['arm_angle'].min()),
+    max_value=float(df['arm_angle'].max()),
+    value=float(avg_arm_angle),
+)
+
+# Filter the dataset for all pitchers with the selected arm angle
+custom_filtered_df = pitch_filtered_df[pitch_filtered_df['arm_angle'] == custom_arm_angle]
+
+# Check if there are matches
+if custom_filtered_df.empty:
+    st.warning(f"No pitchers found with an arm angle of {custom_arm_angle:.2f}°. Heatmap won't include other data.")
+else:
+    # Overlay custom pitcher on the heatmap
+    plt.figure(figsize=(10, 8))
+    sns.kdeplot(
+        data=custom_filtered_df,
+        x='HB',
+        y='iVB',
+        fill=True,
+        cmap='viridis',
+        thresh=0.05,
+        levels=10,
+        cbar=True,
+    )
+
+    # Add existing pitcher's average data point (if selected)
+    plt.scatter(
+        average_hb,
+        average_ivb,
+        color='orange',
+        s=100,
+        label=f"{selected_pitcher} (Avg HB: {average_hb:.2f}, Avg iVB: {average_ivb:.2f})"
+    )
+
+    # Add custom pitcher data point
+    plt.scatter(
+        custom_hb,
+        custom_ivb,
+        color='blue',
+        s=100,
+        label=f"Custom Pitcher (HB: {custom_hb:.2f}, iVB: {custom_ivb:.2f}, Arm Angle: {custom_arm_angle:.2f}°)"
+    )
+
+    # Add lines at x=0 and y=0
+    plt.axhline(0, color='black', linestyle='--', linewidth=1, label='y=0')
+    plt.axvline(0, color='black', linestyle='--', linewidth=1, label='x=0')
+
+    # Set labels and title
+    plt.title(f"Heatmap with Custom Pitcher | Arm Angle: {custom_arm_angle:.2f}°", fontsize=16)
+    plt.xlabel("Horizontal Break (HB)", fontsize=14)
+    plt.ylabel("Induced Vertical Break (iVB)", fontsize=14)
+
+    # Show the plot in Streamlit
+    st.pyplot(plt)
