@@ -33,9 +33,6 @@ if not all(col in df.columns for col in required_columns):
     )
     st.stop()
 
-# --- Existing Section: Pitch Analysis Heatmap ---
-st.subheader("Pitch Analysis Heatmap")
-
 # Step 1: Select pitch type
 selected_pitch = st.selectbox("Select the pitch type", df['pitch_type'].unique())
 
@@ -54,23 +51,58 @@ if filtered_pitch_df.empty:
     st.warning("No data matches the selected pitch type and handedness.")
     st.stop()
 
-# Step 3: Enter iVB, HB, and arm angle for the new pitcher
+# Step 3: Select a pitcher from the filtered data
+available_pitchers = filtered_pitch_df['player_name'].unique()
+selected_pitcher = st.selectbox("Select a pitcher", available_pitchers)
+
+# Filter data for the selected pitcher
+pitcher_data = filtered_pitch_df[filtered_pitch_df['player_name'] == selected_pitcher]
+
+if pitcher_data.empty:
+    st.warning("No data found for the selected pitcher.")
+    st.stop()
+
+# Calculate and display the selected pitcher's average stats
+avg_arm_angle = pitcher_data['arm_angle'].mean()
+avg_velocity = pitcher_data['release_speed'].mean()
+avg_spin_rate = pitcher_data['release_spin_rate'].mean()
+avg_woba = pitcher_data['estimated_woba_using_speedangle'].mean()
+avg_extension = pitcher_data['release_extension'].mean()
+avg_iVB = pitcher_data['iVB'].mean()
+avg_HB = pitcher_data['HB'].mean()
+
+# Sidebar: Display pitcher stats
+st.sidebar.header(f"{selected_pitcher} - Pitch Stats")
+st.sidebar.write(f"**Pitch Type:** {selected_pitch}")
+st.sidebar.write(f"**Average Arm Angle:** {avg_arm_angle:.2f}°")
+st.sidebar.write(f"**Average Velocity:** {avg_velocity:.1f} mph")
+st.sidebar.write(f"**Average Spin Rate:** {avg_spin_rate:.1f} rpm")
+st.sidebar.write(f"**Average wOBA:** {avg_woba:.3f}")
+st.sidebar.write(f"**Average Extension:** {avg_extension:.2f} ft")
+st.sidebar.write(f"**Average iVB:** {avg_iVB:.2f} in")
+st.sidebar.write(f"**Average HB:** {avg_HB:.2f} in")
+
+# Step 4: User inputs arm angle
 input_arm_angle = st.number_input(
     "Enter an arm angle to filter the data (default is the pitcher's average):",
     min_value=float(df['arm_angle'].min()),
     max_value=float(df['arm_angle'].max()),
-    value=float(df['arm_angle'].mean())
+    value=float(avg_arm_angle),
 )
 
 # Filter data based on user input
-filtered_df = filtered_pitch_df[
-    (filtered_pitch_df['arm_angle'] == input_arm_angle)
+final_filtered_df = filtered_pitch_df[
+    filtered_pitch_df['arm_angle'] == input_arm_angle
 ]
 
-# Step 4: Plot heatmap
+if final_filtered_df.empty:
+    st.warning("No data matches the selected arm angle. Please adjust the input.")
+    st.stop()
+
+# Create a KDE heatmap with HB and iVB
 plt.figure(figsize=(10, 8))
 sns.kdeplot(
-    data=filtered_df,
+    data=final_filtered_df,
     x='HB',
     y='iVB',
     fill=True,
@@ -80,68 +112,13 @@ sns.kdeplot(
     cbar=True,
 )
 
-# Set labels and title
-plt.title(f"Heatmap for {selected_pitch} at Arm Angle {input_arm_angle}°", fontsize=16)
-plt.xlabel("Horizontal Break (HB)", fontsize=14)
-plt.ylabel("Induced Vertical Break (iVB)", fontsize=14)
-
-# Set x and y axis limits
-plt.xlim(-30, 30)
-plt.ylim(-30, 30)
-
-# Display the plot
-st.pyplot(plt)
-
-# --- New Section: Create Custom Pitcher ---
-st.subheader("Create Custom Pitcher")
-
-# Step 1: Select pitch type
-new_selected_pitch = st.selectbox("Select the pitch type for your custom pitcher", df['pitch_type'].unique())
-
-# Step 2: Select handedness
-new_selected_handedness = st.selectbox("Select handedness for your custom pitcher", df['p_throws'].unique())
-
-# Step 3: Enter iVB, HB, and arm angle for the new pitcher
-new_iVB = st.number_input("Enter the induced vertical break (iVB) in inches", min_value=-30.0, max_value=30.0, value=0.0)
-new_HB = st.number_input("Enter the horizontal break (HB) in inches", min_value=-30.0, max_value=30.0, value=0.0)
-new_arm_angle = st.number_input("Enter the arm angle in degrees", min_value=-90.0, max_value=90.0, value=0.0)
-
-# Filter data for the selected pitch type and handedness to calculate league averages
-filtered_custom_df = df[
-    (df['pitch_type'] == new_selected_pitch) & 
-    (df['p_throws'] == new_selected_handedness)
-]
-
-# Calculate league average for arm angle and pitch type
-league_avg_arm_angle = filtered_custom_df['arm_angle'].mean()
-league_avg_iVB = filtered_custom_df['iVB'].mean()
-league_avg_HB = filtered_custom_df['HB'].mean()
-
-# Sidebar: Display stats for the new pitcher and league average
-st.sidebar.header("New Pitcher vs League Average")
-st.sidebar.write(f"**Pitch Type:** {new_selected_pitch}")
-st.sidebar.write(f"**Handedness:** {new_selected_handedness}")
-st.sidebar.write(f"**New Pitcher's iVB:** {new_iVB:.2f} in")
-st.sidebar.write(f"**New Pitcher's HB:** {new_HB:.2f} in")
-st.sidebar.write(f"**New Pitcher's Arm Angle:** {new_arm_angle:.2f}°")
-
-st.sidebar.write(f"**League Average Arm Angle:** {league_avg_arm_angle:.2f}°")
-st.sidebar.write(f"**League Average iVB:** {league_avg_iVB:.2f} in")
-st.sidebar.write(f"**League Average HB:** {league_avg_HB:.2f} in")
-
-# Step 4: Plot comparison between new pitcher and league average
-plt.figure(figsize=(10, 8))
-
-# Plot League Average
-sns.scatterplot(
-    x=[league_avg_HB], y=[league_avg_iVB], 
-    color='blue', s=200, label='League Average', marker='X'
-)
-
-# Plot New Pitcher
-sns.scatterplot(
-    x=[new_HB], y=[new_iVB], 
-    color='orange', s=200, label='New Pitcher', marker='o'
+# Highlight the selected pitcher's average HB and iVB
+plt.scatter(
+    avg_HB,
+    avg_iVB,
+    color='orange',
+    s=100,
+    label=f"{selected_pitcher} (Avg HB: {avg_HB:.2f}, Avg iVB: {avg_iVB:.2f})"
 )
 
 # Add lines at x=0 and y=0
@@ -149,7 +126,7 @@ plt.axhline(0, color='black', linestyle='--', linewidth=1, label='y=0')  # Horiz
 plt.axvline(0, color='black', linestyle='--', linewidth=1, label='x=0')  # Vertical line
 
 # Set labels and title
-plt.title(f"Comparison of {new_selected_pitch} Pitch | {new_selected_handedness}-Handed", fontsize=16)
+plt.title(f"{selected_pitch} Heatmap | Arm Angle: {input_arm_angle:.2f}°", fontsize=16)
 plt.xlabel("Horizontal Break (HB)", fontsize=14)
 plt.ylabel("Induced Vertical Break (iVB)", fontsize=14)
 
