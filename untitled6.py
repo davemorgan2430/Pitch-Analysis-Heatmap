@@ -143,7 +143,7 @@ import matplotlib.pyplot as plt
 import streamlit as st
 
 # Streamlit app title
-st.title("Create Custome Pitcher")
+st.title("Create Custom Pitcher")
 
 # Input the Google Drive file ID
 file_id = "1lUKCYNnWi02NA6ICynEGrjsH1uqJeSH7"  # Replace with your Google Drive file ID
