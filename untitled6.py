@@ -153,6 +153,11 @@ custom_filtered_df = pitch_filtered_df[
     (pitch_filtered_df['p_throws'] == custom_handedness)
 ]
 
+
+# Set x and y axis limits
+plt.xlim(-30, 30)
+plt.ylim(-30, 30)
+
 # Check if there are matches
 if custom_filtered_df.empty:
     st.warning(
@@ -173,20 +178,11 @@ else:
         cbar=True,
     )
 
-    # Add existing pitcher's average data point (if selected)
-    plt.scatter(
-        average_hb,
-        average_ivb,
-        color='orange',
-        s=100,
-        label=f"{selected_pitcher} (Avg HB: {average_hb:.2f}, Avg iVB: {average_ivb:.2f})"
-    )
-
     # Add custom pitcher data point
     plt.scatter(
         custom_hb,
         custom_ivb,
-        color='blue',
+        color='orange',
         s=100,
         label=f"Custom Pitcher (HB: {custom_hb:.2f}, iVB: {custom_ivb:.2f}, Arm Angle: {custom_arm_angle:.2f}°, "
               f"Pitch Type: {custom_pitch_type}, Handedness: {custom_handedness})"
@@ -204,9 +200,6 @@ else:
     plt.xlabel("Horizontal Break (HB)", fontsize=14)
     plt.ylabel("Induced Vertical Break (iVB)", fontsize=14)
 
-# Set x and y axis limits
-plt.xlim(-30, 30)
-plt.ylim(-30, 30)
 
     
     # Show the plot in Streamlit
