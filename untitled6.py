@@ -192,6 +192,10 @@ else:
     plt.axhline(0, color='black', linestyle='--', linewidth=1, label='y=0')
     plt.axvline(0, color='black', linestyle='--', linewidth=1, label='x=0')
 
+        # Set plot limits for x and y axes
+    plt.xlim(-30, 30)
+    plt.ylim(-30, 30)
+
     # Set labels and title
     plt.title(
         f"Heatmap with Custom Pitcher | Pitch Type: {custom_pitch_type} | Arm Angle: {custom_arm_angle:.2f}° | Handedness: {custom_handedness}",
