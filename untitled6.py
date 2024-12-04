@@ -1,8 +1,3 @@
-import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
-import streamlit as st
-
 # Streamlit app title
 st.title("Pitch Analysis Heatmap")
 
@@ -20,32 +15,43 @@ except Exception as e:
     st.stop()
 
 # Validate required columns
-required_columns = ['pitch_type', 'player_name', 'arm_angle', 'HB', 'iVB', 'p_throws', 'release_speed', 'release_spin_rate', 'estimated_woba_using_speedangle', 'release_extension']
+required_columns = [
+    'pitch_type', 'player_name', 'arm_angle', 'HB', 'iVB', 
+    'p_throws', 'release_speed', 'release_spin_rate', 
+    'estimated_woba_using_speedangle', 'release_extension'
+]
 if not all(col in df.columns for col in required_columns):
     st.error(
         "The uploaded file is missing required columns. Ensure it contains: "
-        "pitch_type, player_name, arm_angle, HB, iVB, p_throws, velo, spin_rate, wOBA, extension."
+        "pitch_type, player_name, arm_angle, HB, iVB, p_throws, release_speed, "
+        "release_spin_rate, estimated_woba_using_speedangle, release_extension."
     )
     st.stop()
 
 # Step 1: Select pitch type
 selected_pitch = st.selectbox("Select the pitch type", df['pitch_type'].unique())
 
-# Filter DataFrame by selected pitch type
-pitch_filtered_df = df[df['pitch_type'] == selected_pitch]
-
-# Step 4: User selects handedness
+# Step 2: Select handedness
 selected_handedness = st.selectbox(
-    "Select handedness",
-    df['p_throws'].unique()
+    "Select handedness", df['p_throws'].unique()
 )
 
-# Step 2: Select pitcher
-available_pitchers = pitch_filtered_df['player_name'].unique()
+# Filter DataFrame by selected pitch type and handedness
+filtered_pitch_df = df[
+    (df['pitch_type'] == selected_pitch) & 
+    (df['p_throws'] == selected_handedness)
+]
+
+if filtered_pitch_df.empty:
+    st.warning("No data matches the selected pitch type and handedness.")
+    st.stop()
+
+# Step 3: Select a pitcher from the filtered data
+available_pitchers = filtered_pitch_df['player_name'].unique()
 selected_pitcher = st.selectbox("Select a pitcher", available_pitchers)
 
 # Filter data for the selected pitcher
-pitcher_data = pitch_filtered_df[pitch_filtered_df['player_name'] == selected_pitcher]
+pitcher_data = filtered_pitch_df[filtered_pitch_df['player_name'] == selected_pitcher]
 
 if pitcher_data.empty:
     st.warning("No data found for the selected pitcher.")
@@ -71,7 +77,7 @@ st.sidebar.write(f"**Average Extension:** {avg_extension:.2f} ft")
 st.sidebar.write(f"**Average iVB:** {avg_iVB:.2f} in")
 st.sidebar.write(f"**Average HB:** {avg_HB:.2f} in")
 
-# Step 3: User inputs arm angle
+# Step 4: User inputs arm angle
 input_arm_angle = st.number_input(
     "Enter an arm angle to filter the data (default is the pitcher's average):",
     min_value=float(df['arm_angle'].min()),
@@ -80,38 +86,34 @@ input_arm_angle = st.number_input(
 )
 
 # Filter data based on user input
-filtered_df = pitch_filtered_df[
-    (pitch_filtered_df['arm_angle'] == input_arm_angle) &
-    (pitch_filtered_df['p_throws'] == selected_handedness)
+final_filtered_df = filtered_pitch_df[
+    filtered_pitch_df['arm_angle'] == input_arm_angle
 ]
 
-if filtered_df.empty:
-    st.warning("No data matches the selected criteria. Please adjust your filters.")
+if final_filtered_df.empty:
+    st.warning("No data matches the selected arm angle. Please adjust the input.")
     st.stop()
 
 # Create a KDE heatmap with HB and iVB
 plt.figure(figsize=(10, 8))
 sns.kdeplot(
-    data=filtered_df,
+    data=final_filtered_df,
     x='HB',
     y='iVB',
     fill=True,
-    cmap='viridis',  # You can change this to any colormap you prefer
-    thresh=0.05,     # Threshold for contours to appear
-    levels=10,       # Number of contour levels
-    cbar=True,       # Add color bar
+    cmap='viridis',
+    thresh=0.05,
+    levels=10,
+    cbar=True,
 )
 
 # Highlight the selected pitcher's average HB and iVB
-average_hb = pitcher_data['HB'].mean()
-average_ivb = pitcher_data['iVB'].mean()
-
 plt.scatter(
-    average_hb,
-    average_ivb,
+    avg_HB,
+    avg_iVB,
     color='orange',
     s=100,
-    label=f"{selected_pitcher} (Avg HB: {average_hb:.2f}, Avg iVB: {average_ivb:.2f})"
+    label=f"{selected_pitcher} (Avg HB: {avg_HB:.2f}, Avg iVB: {avg_iVB:.2f})"
 )
 
 # Add lines at x=0 and y=0
@@ -127,9 +129,9 @@ plt.ylabel("Induced Vertical Break (iVB)", fontsize=14)
 plt.xlim(-30, 30)
 plt.ylim(-30, 30)
 
-
 # Display the plot in Streamlit
 st.pyplot(plt)
+
 
 # Step 5: Create your own pitcher feature
 st.header("Create Your Own Pitcher")
