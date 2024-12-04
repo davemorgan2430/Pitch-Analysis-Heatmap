@@ -1,3 +1,8 @@
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+import streamlit as st
+
 # Streamlit app title
 st.title("Pitch Analysis Heatmap")
 
