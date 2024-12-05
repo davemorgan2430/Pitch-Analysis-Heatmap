@@ -26,13 +26,13 @@ except Exception as e:
 required_columns = [
     'pitch_type', 'player_name', 'arm_angle', 'HB', 'iVB', 
     'p_throws', 'release_speed', 'release_spin_rate', 
-    'estimated_woba_using_speedangle', 'release_extension'
+    'estimated_woba_using_speedangle', 'release_extension', 'release_pos_z'
 ]
 if not all(col in df.columns for col in required_columns):
     st.error(
         "The uploaded file is missing required columns. Ensure it contains: "
         "pitch_type, player_name, arm_angle, HB, iVB, p_throws, release_speed, "
-        "release_spin_rate, estimated_woba_using_speedangle, release_extension."
+        "release_spin_rate, estimated_woba_using_speedangle, release_extension, release_pos_z."
     )
     st.stop()
 
@@ -71,6 +71,7 @@ avg_velocity = pitcher_data['release_speed'].mean()
 avg_spin_rate = pitcher_data['release_spin_rate'].mean()
 avg_woba = pitcher_data['estimated_woba_using_speedangle'].mean()
 avg_extension = pitcher_data['release_extension'].mean()
+avg_release = pitcher_data['release_pos_z'].mean()
 avg_iVB = pitcher_data['iVB'].mean()
 avg_HB = pitcher_data['HB'].mean()
 
@@ -82,6 +83,7 @@ st.sidebar.write(f"**Average Velocity:** {avg_velocity:.1f} mph")
 st.sidebar.write(f"**Average Spin Rate:** {avg_spin_rate:.1f} rpm")
 st.sidebar.write(f"**Average wOBA:** {avg_woba:.3f}")
 st.sidebar.write(f"**Average Extension:** {avg_extension:.2f} ft")
+st.sidebar.write(f"**Average Release:** {avg_release:.2f} ft")
 st.sidebar.write(f"**Average iVB:** {avg_iVB:.2f} in")
 st.sidebar.write(f"**Average HB:** {avg_HB:.2f} in")
 
