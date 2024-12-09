@@ -7,7 +7,7 @@ import streamlit as st
 st.title("Pitch Analysis Heatmap")
 
 # Example to add a clickable link
-st.markdown("[Need Inspiration? Click here to find and sort for MLB's best pitches of 2024](https://www.fangraphs.com/leaders/major-league?pos=all&stats=pit&lg=all&qual=y&type=36&season=2024&month=0&season1=2024&ind=0)")
+st.markdown("[Need Inspiration? Click here to find and sort for MLB's best pitches of 2024](https://www.fangraphs.com/leaders/major-league?pos=all&stats=pit&lg=all&type=36&season=2024&month=0&season1=2024&ind=0&sortcol=3&sortdir=default&qual=20&pagenum=1)
 
 # Input the Google Drive file ID
 file_id = "1lUKCYNnWi02NA6ICynEGrjsH1uqJeSH7"  # Replace with your Google Drive file ID
