@@ -315,14 +315,16 @@ for pitch_type in set(pitch['pitch_type'] for pitch in st.session_state['user_pi
     )
 
 # Overlay user-defined pitches on the same plot
-for pitch in st.session_state['user_pitches']:
-    plt.scatter(
-        pitch['HB'],
-        pitch['iVB'],
-        label=f"User {pitch['pitch_type']} (iVB={pitch['iVB']:.2f}, HB={pitch['HB']:.2f})",
-        s=100,  # Marker size
-        alpha=0.8  # Transparency
-    )
+plt.scatter(
+    pitch['HB'],
+    pitch['iVB'],
+    color='orange',  # Set a consistent color for all user data points
+    s=100,           # Marker size
+    alpha=1.3        # Transparency
+)
+
+# Optional: Single label for user-defined pitches
+plt.scatter([], [], color='orange', label="User Pitches", s=100)
 
 # Add lines at x=0 and y=0
 plt.axhline(0, color='black', linestyle='--', linewidth=1, label='y=0')
