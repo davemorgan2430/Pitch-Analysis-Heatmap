@@ -243,8 +243,12 @@ plt.legend()
 # Display the heatmap
 st.pyplot(plt)
 
-# Section: Enhanced Create a Pitcher
-st.header("Create a Pitcher - Multiple Pitches")
+# Section: Enhanced Create a Pitcher with Multiple Pitches and Separate Heatmaps
+st.header("Create a Pitcher - Multiple Pitches and Heatmaps by Pitch Type")
+
+# Initialize session state for user pitches
+if 'user_pitches' not in st.session_state:
+    st.session_state['user_pitches'] = []
 
 # Input: Select arm angle range
 min_arm_angle = st.number_input("Enter minimum arm angle:", value=-20.0)
@@ -260,18 +264,15 @@ if league_filtered.empty:
     st.warning("No league data found for the specified arm angle range.")
     st.stop()
 
-# Initialize a list to store user-defined pitches
-user_pitches = []
-
 # Input: Add pitches with type, iVB, and HB
 st.subheader("Add Pitches")
 pitch_type = st.selectbox("Select pitch type:", df['pitch_type'].unique())
 iVB = st.number_input(f"Enter {pitch_type} iVB (inches):")
 HB = st.number_input(f"Enter {pitch_type} HB (inches):")
 
-# Button to add the pitch to the list
+# Button to add the pitch to the session state
 if st.button("Add Pitch"):
-    user_pitches.append({
+    st.session_state['user_pitches'].append({
         'pitch_type': pitch_type,
         'iVB': iVB,
         'HB': HB
@@ -279,17 +280,26 @@ if st.button("Add Pitch"):
     st.success(f"Added {pitch_type} with iVB={iVB:.2f} and HB={HB:.2f}")
 
 # Show the list of added pitches
-if user_pitches:
+if st.session_state['user_pitches']:
     st.write("### Added Pitches:")
-    for pitch in user_pitches:
+    for pitch in st.session_state['user_pitches']:
         st.write(f"- {pitch['pitch_type']}: iVB={pitch['iVB']:.2f}, HB={pitch['HB']:.2f}")
 
-# Plot the heatmap and user-defined pitches
-if user_pitches:
-    # Create KDE heatmap for league average
+# Plot separate heatmaps for each pitch type
+for pitch_type in league_filtered['pitch_type'].unique():
+    st.write(f"### Heatmap for {pitch_type}")
+    
+    # Filter league data for the current pitch type
+    league_pitch_filtered = league_filtered[league_filtered['pitch_type'] == pitch_type]
+    
+    if league_pitch_filtered.empty:
+        st.warning(f"No data found for league averages of {pitch_type}.")
+        continue
+
+    # Create a heatmap for the league averages of this pitch type
     plt.figure(figsize=(12, 10))
     sns.kdeplot(
-        data=league_filtered,
+        data=league_pitch_filtered,
         x='HB',
         y='iVB',
         fill=True,
@@ -300,15 +310,16 @@ if user_pitches:
         label="League Average"
     )
 
-    # Plot user-defined pitches on the heatmap
-    for pitch in user_pitches:
-        plt.scatter(
-            pitch['HB'],
-            pitch['iVB'],
-            label=f"{pitch['pitch_type']} (iVB={pitch['iVB']:.2f}, HB={pitch['HB']:.2f})",
-            s=100,  # Marker size
-            alpha=0.8  # Transparency
-        )
+    # Overlay user-defined pitches for this pitch type
+    for pitch in st.session_state['user_pitches']:
+        if pitch['pitch_type'] == pitch_type:
+            plt.scatter(
+                pitch['HB'],
+                pitch['iVB'],
+                label=f"User {pitch['pitch_type']} (iVB={pitch['iVB']:.2f}, HB={pitch['HB']:.2f})",
+                s=100,  # Marker size
+                alpha=0.8  # Transparency
+            )
 
     # Add lines at x=0 and y=0
     plt.axhline(0, color='black', linestyle='--', linewidth=1, label='y=0')
@@ -316,7 +327,7 @@ if user_pitches:
 
     # Set labels, title, and legend
     plt.title(
-        f"Pitch Movement Comparison | Arm Angle Range: {min_arm_angle}° to {max_arm_angle}°",
+        f"Movement Heatmap for {pitch_type} | Arm Angle Range: {min_arm_angle}° to {max_arm_angle}°",
         fontsize=16
     )
     plt.xlabel("Horizontal Break (HB)", fontsize=14)
@@ -327,4 +338,3 @@ if user_pitches:
 
     # Display the plot in Streamlit
     st.pyplot(plt)
-
