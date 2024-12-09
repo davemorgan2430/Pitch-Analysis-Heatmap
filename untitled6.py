@@ -243,4 +243,88 @@ plt.legend()
 # Display the heatmap
 st.pyplot(plt)
 
+# Section: Enhanced Create a Pitcher
+st.header("Create a Pitcher - Multiple Pitches")
+
+# Input: Select arm angle range
+min_arm_angle = st.number_input("Enter minimum arm angle:", value=-20.0)
+max_arm_angle = st.number_input("Enter maximum arm angle:", value=20.0)
+
+# Filter league data based on arm angle range
+league_filtered = df[
+    (df['arm_angle'] >= min_arm_angle) &
+    (df['arm_angle'] <= max_arm_angle)
+]
+
+if league_filtered.empty:
+    st.warning("No league data found for the specified arm angle range.")
+    st.stop()
+
+# Initialize a list to store user-defined pitches
+user_pitches = []
+
+# Input: Add pitches with type, iVB, and HB
+st.subheader("Add Pitches")
+pitch_type = st.selectbox("Select pitch type:", df['pitch_type'].unique())
+iVB = st.number_input(f"Enter {pitch_type} iVB (inches):")
+HB = st.number_input(f"Enter {pitch_type} HB (inches):")
+
+# Button to add the pitch to the list
+if st.button("Add Pitch"):
+    user_pitches.append({
+        'pitch_type': pitch_type,
+        'iVB': iVB,
+        'HB': HB
+    })
+    st.success(f"Added {pitch_type} with iVB={iVB:.2f} and HB={HB:.2f}")
+
+# Show the list of added pitches
+if user_pitches:
+    st.write("### Added Pitches:")
+    for pitch in user_pitches:
+        st.write(f"- {pitch['pitch_type']}: iVB={pitch['iVB']:.2f}, HB={pitch['HB']:.2f}")
+
+# Plot the heatmap and user-defined pitches
+if user_pitches:
+    # Create KDE heatmap for league average
+    plt.figure(figsize=(12, 10))
+    sns.kdeplot(
+        data=league_filtered,
+        x='HB',
+        y='iVB',
+        fill=True,
+        cmap='viridis',
+        thresh=0.05,
+        levels=10,
+        cbar=True,
+        label="League Average"
+    )
+
+    # Plot user-defined pitches on the heatmap
+    for pitch in user_pitches:
+        plt.scatter(
+            pitch['HB'],
+            pitch['iVB'],
+            label=f"{pitch['pitch_type']} (iVB={pitch['iVB']:.2f}, HB={pitch['HB']:.2f})",
+            s=100,  # Marker size
+            alpha=0.8  # Transparency
+        )
+
+    # Add lines at x=0 and y=0
+    plt.axhline(0, color='black', linestyle='--', linewidth=1, label='y=0')
+    plt.axvline(0, color='black', linestyle='--', linewidth=1, label='x=0')
+
+    # Set labels, title, and legend
+    plt.title(
+        f"Pitch Movement Comparison | Arm Angle Range: {min_arm_angle}° to {max_arm_angle}°",
+        fontsize=16
+    )
+    plt.xlabel("Horizontal Break (HB)", fontsize=14)
+    plt.ylabel("Induced Vertical Break (iVB)", fontsize=14)
+    plt.xlim(-30, 30)
+    plt.ylim(-30, 30)
+    plt.legend()
+
+    # Display the plot in Streamlit
+    st.pyplot(plt)
 
