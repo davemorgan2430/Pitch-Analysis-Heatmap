@@ -320,7 +320,7 @@ for pitch in st.session_state['user_pitches']:
         pitch['HB'],
         pitch['iVB'],
         color='orange',
-        label=f"User {pitch['pitch_type']} (iVB={pitch['iVB']:.2f}, HB={pitch['HB']:.2f})",
+        label=f"{pitch['pitch_type']} (iVB={pitch['iVB']:.2f}, HB={pitch['HB']:.2f})",
         s=100,  # Marker size
         alpha=1.0  # Transparency
     )
