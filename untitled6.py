@@ -307,7 +307,7 @@ for pitch_type in set(pitch['pitch_type'] for pitch in st.session_state['user_pi
         x='HB',
         y='iVB',
         fill=True,
-        cmap='coolwarm',
+        cmap='viridis',
         alpha=0.5,
         thresh=0.05,
         levels=10,
@@ -322,9 +322,6 @@ plt.scatter(
     s=100,           # Marker size
     alpha=1.3        # Transparency
 )
-
-# Optional: Single label for user-defined pitches
-plt.scatter([], [], color='orange', label="User Pitches", s=100)
 
 # Add lines at x=0 and y=0
 plt.axhline(0, color='black', linestyle='--', linewidth=1, label='y=0')
