@@ -320,7 +320,7 @@ plt.scatter(
     pitch['iVB'],
     color='orange',  # Set a consistent color for all user data points
     s=100,           # Marker size
-    alpha=1.3        # Transparency
+    alpha=1.0        # Transparency
 )
 
 # Add lines at x=0 and y=0
