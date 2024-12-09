@@ -246,6 +246,11 @@ st.pyplot(plt)
 # Section: Create a Pitcher with Combined Plot
 st.header("Create a Pitcher - Combined Plot for Multiple Pitches")
 
+# Button to reset session state
+if st.button("Reset All Data"):
+    st.session_state['user_pitches'] = []  # Clear all user pitches
+    st.success("All data has been reset!")
+
 # Step 1: Select handedness
 selected_handedness = st.selectbox("Select handedness:", df['p_throws'].unique())
 
