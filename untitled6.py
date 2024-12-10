@@ -348,62 +348,73 @@ plt.legend()
 # Display the plot in Streamlit
 st.pyplot(plt)
 
-# Section: Pitcher Movement Plot vs. League Average
-st.header("Pitcher Movement Plot vs. League Average")
+# Section: Combined Pitcher Movement vs. League Heatmap
+st.header("Pitcher Movement vs. League Average Heatmap")
 
-# Input pitcher's name
-pitcher_name = st.text_input("Enter Pitcher's Name:")
+# Input or select pitcher's name
+selected_pitcher = st.selectbox(
+    "Select a Pitcher:",
+    sorted(df['player_name'].unique())
+)
 
-if pitcher_name:
+if selected_pitcher:
     # Filter data for the selected pitcher
-    pitcher_df = df[df['player_name'] == pitcher_name]
+    pitcher_data = df[df['player_name'] == selected_pitcher]
 
-    if pitcher_df.empty:
-        st.warning(f"No data found for pitcher {pitcher_name}. Please check the name.")
+    if pitcher_data.empty:
+        st.warning(f"No data found for pitcher {selected_pitcher}.")
     else:
         # Get the handedness of the selected pitcher
-        pitcher_handedness = pitcher_df['p_throws'].iloc[0]
+        handedness = pitcher_data['p_throws'].iloc[0]
 
         # Initialize the plot
         plt.figure(figsize=(12, 10))
 
-        # Loop through each pitch type the pitcher throws
-        for pitch_type in pitcher_df['pitch_type'].unique():
-            # Filter data for the pitch type
-            pitcher_pitch_data = pitcher_df[pitcher_df['pitch_type'] == pitch_type]
-            arm_angle_range = (
-                pitcher_pitch_data['arm_angle'].min(),
-                pitcher_pitch_data['arm_angle'].max()
-            )
+        for pitch_type in pitcher_data['pitch_type'].unique():
+            # Filter pitcher data for the current pitch type
+            pitcher_pitch_data = pitcher_data[pitcher_data['pitch_type'] == pitch_type]
 
-            # Filter league data for the same pitch type, handedness, and arm angle range
+            # Get arm angle range
+            arm_angle_min = pitcher_pitch_data['arm_angle'].min()
+            arm_angle_max = pitcher_pitch_data['arm_angle'].max()
+
+            # Filter league data for the same handedness, pitch type, and arm angle range
             league_pitch_data = df[
                 (df['pitch_type'] == pitch_type) &
-                (df['p_throws'] == pitcher_handedness) &
-                (df['arm_angle'] >= arm_angle_range[0]) &
-                (df['arm_angle'] <= arm_angle_range[1])
+                (df['p_throws'] == handedness) &
+                (df['arm_angle'] >= arm_angle_min) &
+                (df['arm_angle'] <= arm_angle_max)
             ]
 
-            # Calculate league average iVB and HB for this pitch type
-            avg_ivb = league_pitch_data['iVB'].mean()
-            avg_hb = league_pitch_data['HB'].mean()
-
-            # Plot league average
-            plt.scatter(
-                avg_hb, avg_ivb, 
-                color='blue', s=150, label=f"League Avg: {pitch_type}", alpha=0.6
+            # Generate a heatmap for league data (HB vs. iVB)
+            sns.kdeplot(
+                data=league_pitch_data,
+                x='HB',
+                y='iVB',
+                fill=True,
+                cmap='Blues',  # Use distinct color map for league average
+                alpha=0.6,
+                thresh=0.05,  # Threshold for contours to appear
+                levels=10,
+                label=f"League Avg: {pitch_type}",
             )
 
-            # Plot pitcher's pitches
+            # Overlay the pitcher's data points for the current pitch type
+            avg_hb = pitcher_pitch_data['HB'].mean()
+            avg_ivb = pitcher_pitch_data['iVB'].mean()
+
             plt.scatter(
-                pitcher_pitch_data['HB'], pitcher_pitch_data['iVB'],
-                s=100, label=f"{pitch_type} (Pitcher)", alpha=0.8
+                avg_hb,
+                avg_ivb,
+                s=100,
+                label=f"{selected_pitcher} ({pitch_type})",
+                edgecolor='black'
             )
 
         # Add grid, lines, and labels
         plt.axhline(0, color='black', linestyle='--', linewidth=1, label='y=0')  # Horizontal line
         plt.axvline(0, color='black', linestyle='--', linewidth=1, label='x=0')  # Vertical line
-        plt.title(f"Movement Comparison: {pitcher_name} vs. League Average", fontsize=16)
+        plt.title(f"Movement Comparison: {selected_pitcher} vs. League Average", fontsize=16)
         plt.xlabel("Horizontal Break (HB)", fontsize=14)
         plt.ylabel("Induced Vertical Break (iVB)", fontsize=14)
         plt.xlim(-30, 30)
@@ -413,5 +424,3 @@ if pitcher_name:
 
         # Display the plot in Streamlit
         st.pyplot(plt)
-
-
