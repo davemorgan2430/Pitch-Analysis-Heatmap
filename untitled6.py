@@ -392,7 +392,7 @@ if selected_pitcher:
                 x='HB',
                 y='iVB',
                 fill=True,
-                cmap='Viridis',  # Use distinct color map for league average
+                cmap='viridis',  # Use distinct color map for league average
                 alpha=0.6,
                 thresh=0.05,  # Threshold for contours to appear
                 levels=10,
