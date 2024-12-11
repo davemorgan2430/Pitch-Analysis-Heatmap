@@ -264,7 +264,7 @@ st.header("Pitcher Movement vs. League Average Heatmap")
 import plotly.express as px
 pitcher_name = st.selectbox("Select a pitcher for comparison", df['player_name'].unique())
 pitcher_df = df[df['player_name'] == pitcher_name]
-    if not pitcher_df.empty:
+if not pitcher_df.empty:
         league_data = df[df['p_throws'] == pitcher_df['p_throws'].iloc[0]]
         league_data_grouped = league_data.groupby(['pitch_type']).agg({'HB': 'mean', 'iVB': 'mean'}).reset_index()
         
