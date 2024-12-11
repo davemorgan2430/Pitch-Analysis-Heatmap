@@ -309,8 +309,8 @@ if selected_pitcher:
                 y='iVB',
                 fill=True,
                 cmap='viridis',  # Use distinct color map for league average
-                alpha=0.6,
-                thresh=0.05,  # Threshold for contours to appear
+                alpha=0.4,
+                thresh=0.03,  # Threshold for contours to appear
                 levels=10,
                 label=f"League Avg: {pitch_type}",
             )
