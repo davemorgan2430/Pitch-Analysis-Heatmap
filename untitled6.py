@@ -328,8 +328,8 @@ if selected_pitcher:
             )
 
         # Add grid, lines, and labels
-        plt.axhline(0, color='black', linestyle='--', linewidth=1, label='y=0')  # Horizontal line
-        plt.axvline(0, color='black', linestyle='--', linewidth=1, label='x=0')  # Vertical line
+        plt.axhline(0, color='black', linestyle='--', linewidth=1)  # Horizontal line
+        plt.axvline(0, color='black', linestyle='--', linewidth=1)  # Vertical line
         plt.title(f"Movement Comparison: {selected_pitcher} vs. League Average", fontsize=16)
         plt.xlabel("Horizontal Break (HB)", fontsize=14)
         plt.ylabel("Induced Vertical Break (iVB)", fontsize=14)
