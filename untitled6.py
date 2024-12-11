@@ -35,9 +35,9 @@ if not all(col in df.columns for col in required_columns):
         "release_spin_rate, estimated_woba_using_speedangle, release_extension, release_pos_z."
     )
     st.stop()
-tabs = st.tabs(["Pitch Analysis Heatmap", "Create a Pitcher", "Pitcher Comparison"])
+tab1, tab2, tab3 = st.tabs(["Pitch Analysis Heatmap", "Create a Pitcher", "Pitcher Comparison"])
 
-with tabs[0]:
+with tab1:
     st.header("Pitch Analysis Heatmap")
 # Step 1: Select pitch type
 selected_pitch = st.selectbox("Select the pitch type", df['pitch_type'].unique())
@@ -153,7 +153,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import streamlit as st
 
-with tabs[1]:
+with tab2:
     st.header("Create a Pitcher")
 
 # Section: Create a Pitcher with Combined Plot
@@ -165,7 +165,7 @@ if st.button("Reset All Data"):
     st.success("All data has been reset!")
 
 
-with tabs[2]:
+with tab3:
     st.header("Pitcher Movement vs. League Average")
 # Step 1: Select handedness
 selected_handedness = st.selectbox("Select handedness:", df['p_throws'].unique())
