@@ -116,7 +116,7 @@ sns.kdeplot(
     y='iVB',
     fill=True,
     cmap='viridis',
-    thresh=0.05,
+    thresh=0.09,
     levels=10,
     cbar=True,
 )
