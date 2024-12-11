@@ -35,9 +35,7 @@ if not all(col in df.columns for col in required_columns):
         "release_spin_rate, estimated_woba_using_speedangle, release_extension, release_pos_z."
     )
     st.stop()
-tab1, tab2, tab3 = st.tabs(["Pitch Analysis Heatmap", "Create a Pitcher", "Pitcher Comparison"])
 
-with tab1:
     st.header("Pitch Analysis Heatmap")
 # Step 1: Select pitch type
 selected_pitch = st.selectbox("Select the pitch type", df['pitch_type'].unique())
@@ -152,9 +150,6 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import streamlit as st
-
-with tab2:
-    st.header("Create a Pitcher")
 
 # Section: Create a Pitcher with Combined Plot
 st.header("Create a Pitcher - Combined Plot for Multiple Pitches")
