@@ -159,9 +159,6 @@ if st.button("Reset All Data"):
     st.session_state['user_pitches'] = []  # Clear all user pitches
     st.success("All data has been reset!")
 
-
-with tab3:
-    st.header("Pitcher Movement vs. League Average")
 # Step 1: Select handedness
 selected_handedness = st.selectbox("Select handedness:", df['p_throws'].unique())
 
