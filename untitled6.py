@@ -44,9 +44,9 @@ analysis_type = st.selectbox(
     ["Single Pitch Movement vs League Average", "Pitcher Movements vs League Average"]
 )
 
-if analysis_type == "Pitch Analysis Heatmap":
+if analysis_type == "Single Pitch Movement vs League Average":
     # Pitch Analysis Heatmap Code
-    st.subheader("Pitch Analysis Heatmap")
+    st.subheader("Single Pitch Movement vs League Average")
     selected_pitch = st.selectbox("Select the pitch type", df['pitch_type'].unique())
     pitch_filtered_df = df[df['pitch_type'] == selected_pitch]
     selected_handedness = st.selectbox("Select handedness", df['p_throws'].unique())
