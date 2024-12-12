@@ -1,3 +1,8 @@
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+import streamlit as st
+
 # Section: Combined Analysis
 st.header("Pitch Analysis and Movement Comparison")
 
