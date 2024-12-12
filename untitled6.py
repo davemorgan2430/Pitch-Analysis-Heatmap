@@ -258,46 +258,61 @@ st.pyplot(plt)
 
 import plotly.express as px
 
-# Section: Combined Pitcher Movement vs. League Heatmap
-st.header("Pitcher Movement vs. League Average Heatmap")
-
-import plotly.express as px
+# Section: Pitcher Movements vs League Average
+st.header("Pitcher Movements vs League Average")
 pitcher_name = st.selectbox("Select a pitcher for comparison", df['player_name'].unique())
+
+# Filter data for the selected pitcher
 pitcher_df = df[df['player_name'] == pitcher_name]
+
 if not pitcher_df.empty:
-        league_data = df[df['p_throws'] == pitcher_df['p_throws'].iloc[0]]
-        league_data_grouped = league_data.groupby(['pitch_type']).agg({'HB': 'mean', 'iVB': 'mean'}).reset_index()
-        
-        # Combine pitcher data and league average into one DataFrame
-        combined_data = pd.DataFrame()
-        for pitch in pitcher_df['pitch_type'].unique():
-            pitch_data = pitcher_df[pitcher_df['pitch_type'] == pitch]
-            avg_hb = pitch_data['HB'].mean()
-            avg_ivb = pitch_data['iVB'].mean()
-            combined_data = pd.concat([
-                combined_data, 
-                pd.DataFrame({'pitch_type': [pitch], 'HB': [avg_hb], 'iVB': [avg_ivb], 'type': [f"{pitcher_name}'s Pitch"]})
-            ])
-        
-        league_data_grouped['type'] = "League Average"
-        combined_data = pd.concat([combined_data, league_data_grouped])
-        
-        # Create an interactive scatter plot
-        fig = px.scatter(
+    # Filter league data by handedness
+    league_data = df[df['p_throws'] == pitcher_df['p_throws'].iloc[0]]
+    
+    # Calculate league average for each pitch type
+    league_data_grouped = league_data.groupby(['pitch_type']).agg({'HB': 'mean', 'iVB': 'mean'}).reset_index()
+    
+    # Prepare combined data for plotting
+    combined_data = pd.DataFrame()
+    for pitch in pitcher_df['pitch_type'].unique():
+        pitch_data = pitcher_df[pitcher_df['pitch_type'] == pitch]
+        avg_hb = pitch_data['HB'].mean()
+        avg_ivb = pitch_data['iVB'].mean()
+        combined_data = pd.concat([
             combined_data,
-            x='HB',
-            y='iVB',
-            color='type',
-            symbol='type',
-            text='pitch_type',  # Adds pitch type as hover text
-            labels={'HB': "Horizontal Break", 'iVB': "Induced Vertical Break"},
-            title=f"{pitcher_name} vs League Average Pitch Movement",
-            template="plotly_white"
-        )
-        fig.update_traces(marker=dict(size=10), textposition="top center")
-        fig.update_layout(showlegend=True)
-        
-        # Display the interactive plot in Streamlit
-        st.plotly_chart(fig, use_container_width=True)
-    else:
-        st.warning("No data available for the selected pitcher.")
+            pd.DataFrame({'pitch_type': [pitch], 'HB': [avg_hb], 'iVB': [avg_ivb], 'type': [f"{pitcher_name}'s Pitch"]})
+        ])
+    
+    # Add league averages to the combined data
+    league_data_grouped['type'] = "League Average"
+    combined_data = pd.concat([combined_data, league_data_grouped])
+    
+    # Create an interactive scatter plot
+    fig = px.scatter(
+        combined_data,
+        x='HB',
+        y='iVB',
+        color='type',
+        symbol='type',
+        text='pitch_type',  # Hover text showing pitch type
+        labels={'HB': "Horizontal Break", 'iVB': "Induced Vertical Break"},
+        title=f"{pitcher_name} vs League Average Pitch Movement",
+        template="plotly_white"
+    )
+    
+    # Customize marker size and text position
+    fig.update_traces(marker=dict(size=10), textposition="top center")
+    
+    # Add grid lines and enhance layout
+    fig.update_layout(
+        showlegend=True,
+        xaxis_title="Horizontal Break (HB)",
+        yaxis_title="Induced Vertical Break (iVB)",
+        xaxis=dict(showgrid=True),
+        yaxis=dict(showgrid=True),
+    )
+    
+    # Display the interactive plot in Streamlit
+    st.plotly_chart(fig, use_container_width=True)
+else:
+    st.warning("No data available for the selected pitcher.")
