@@ -267,58 +267,47 @@ if not pitcher_df.empty:
     # Filter league data by handedness
     league_data = df[df['p_throws'] == pitcher_df['p_throws'].iloc[0]]
     
-    # Calculate league average for each pitch type
-    league_data_grouped = league_data.groupby(['pitch_type']).agg({'HB': 'mean', 'iVB': 'mean'}).reset_index()
+    # Create a KDE heatmap for league averages
+    plt.figure(figsize=(10, 8))
+    sns.kdeplot(
+        data=league_data,
+        x='HB',
+        y='iVB',
+        fill=True,
+        cmap='viridis',  # Heatmap color scheme
+        thresh=0.05,      # Minimum density for contours
+        levels=20,        # Number of contour levels
+        cbar=True,        # Show color bar
+        alpha=0.7,        # Transparency for the heatmap
+    )
     
-    # Prepare combined data for plotting
-    combined_data = pd.DataFrame()
-    for pitch in pitcher_df['pitch_type'].unique():
-        pitch_data = pitcher_df[pitcher_df['pitch_type'] == pitch]
+    # Plot the player's pitches as scatter points
+    for pitch_type in pitcher_df['pitch_type'].unique():
+        pitch_data = pitcher_df[pitcher_df['pitch_type'] == pitch_type]
         avg_hb = pitch_data['HB'].mean()
         avg_ivb = pitch_data['iVB'].mean()
-        combined_data = pd.concat([
-            combined_data,
-            pd.DataFrame({'pitch_type': [pitch], 'HB': [avg_hb], 'iVB': [avg_ivb], 'type': [f"{pitcher_name}'s Pitch"]})
-        ])
-    
-    # Add league averages to the combined data
-    league_data_grouped['type'] = "League Average"
-    combined_data = pd.concat([combined_data, league_data_grouped])
-    
-    # Separate player's data and league data
-    player_data = combined_data[combined_data['type'] == f"{pitcher_name}'s Pitch"]
-    league_data = combined_data[combined_data['type'] == "League Average"]
-    
-    # Create a scatter plot
-    plt.figure(figsize=(10, 8))
-    
-    # Plot player's pitches
-    plt.scatter(
-        player_data['HB'], player_data['iVB'], color='blue', label=f"{pitcher_name}'s Pitches", alpha=0.8
-    )
-    for i, row in player_data.iterrows():
-        plt.text(row['HB'], row['iVB'], row['pitch_type'], fontsize=10, color='blue', ha='right', va='bottom')
-    
-    # Plot league averages
-    plt.scatter(
-        league_data['HB'], league_data['iVB'], color='red', label="League Average", alpha=0.8
-    )
-    for i, row in league_data.iterrows():
-        plt.text(row['HB'], row['iVB'], row['pitch_type'], fontsize=10, color='red', ha='left', va='top')
+        
+        # Add the player's data points with text annotations
+        plt.scatter(avg_hb, avg_ivb, color='blue', s=100, label=pitch_type)
+        plt.text(
+            avg_hb, avg_ivb, pitch_type,
+            fontsize=12, color='black', ha='center', va='center', weight='bold',
+            bbox=dict(facecolor='white', edgecolor='blue', boxstyle='round,pad=0.3')
+        )
     
     # Add lines at x=0 and y=0
-    plt.axhline(0, color='black', linestyle='--', linewidth=1, label='y=0')  # Horizontal line
-    plt.axvline(0, color='black', linestyle='--', linewidth=1, label='x=0')  # Vertical line
+    plt.axhline(0, color='black', linestyle='--', linewidth=1)  # Horizontal line
+    plt.axvline(0, color='black', linestyle='--', linewidth=1)  # Vertical line
     
     # Set plot labels and title
     plt.title(f"{pitcher_name} vs League Average Pitch Movement", fontsize=16)
     plt.xlabel("Horizontal Break (HB)", fontsize=14)
     plt.ylabel("Induced Vertical Break (iVB)", fontsize=14)
-    plt.legend(loc="best")
-    
-    # Set x and y axis limits
     plt.xlim(-30, 30)
     plt.ylim(-30, 30)
+    
+    # Add legend for pitch types
+    plt.legend(title="Pitch Type")
     
     # Display the plot in Streamlit
     st.pyplot(plt)
