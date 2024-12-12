@@ -3,6 +3,36 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import streamlit as st
 
+# Example to add a clickable link
+st.markdown("[Need Inspiration? Click here to sort and filter through 2024's best pitches via FanGraphs.](https://www.fangraphs.com/leaders/major-league?pos=all&stats=pit&lg=all&type=36&season=2024&month=0&season1=2024&ind=0&sortcol=3&sortdir=default&qual=20&pagenum=1)")
+
+# Input the Google Drive file ID
+file_id = "1lUKCYNnWi02NA6ICynEGrjsH1uqJeSH7"  # Replace with your Google Drive file ID
+url = f"https://drive.google.com/uc?id={file_id}"
+
+# Load the CSV file into a DataFrame
+try:
+    df = pd.read_csv(url)
+    st.write("Data loaded successfully!")
+except Exception as e:
+    st.error("Error loading the file. Please check the file ID or format.")
+    st.error(e)
+    st.stop()
+
+# Validate required columns
+required_columns = [
+    'pitch_type', 'player_name', 'arm_angle', 'HB', 'iVB', 
+    'p_throws', 'release_speed', 'release_spin_rate', 
+    'estimated_woba_using_speedangle', 'release_extension', 'release_pos_z'
+]
+if not all(col in df.columns for col in required_columns):
+    st.error(
+        "The uploaded file is missing required columns. Ensure it contains: "
+        "pitch_type, player_name, arm_angle, HB, iVB, p_throws, release_speed, "
+        "release_spin_rate, estimated_woba_using_speedangle, release_extension, release_pos_z."
+    )
+    st.stop()
+
 # Section: Combined Analysis
 st.header("Pitch Analysis and Movement Comparison")
 
