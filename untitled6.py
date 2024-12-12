@@ -292,7 +292,7 @@ if not pitcher_df.empty:
             cmap=colormap_dict.get(pitch_type, 'viridis'),  # Default colormap if undefined
             thresh=0.05,  # Minimum density for contours
             levels=15,    # Number of contour levels
-            alpha=0.5,    # Transparency for overlays
+            alpha=0.3,    # Transparency for overlays
             label=f"{pitch_type} (League Avg)",
         )
         
@@ -319,9 +319,6 @@ if not pitcher_df.empty:
     plt.ylabel("Induced Vertical Break (iVB)", fontsize=14)
     plt.xlim(-30, 30)
     plt.ylim(-30, 30)
-    
-    # Add legend for clarity
-    plt.legend(title="Pitch Types")
     
     # Display the plot in Streamlit
     st.pyplot(plt)
