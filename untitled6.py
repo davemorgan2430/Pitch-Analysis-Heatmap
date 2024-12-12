@@ -35,15 +35,7 @@ if not all(col in df.columns for col in required_columns):
     )
     st.stop()
 
-# Section: Combined Analysis
-st.header("Pitch Analysis and Movement Comparison")
-
-# Dropdown menu for selecting analysis type
-analysis_type = st.selectbox(
-    "Select Analysis Type",
-    ["Single Pitch Movement vs League Average", "All Movements vs League Average"]
-)
-
+# Section: Single Pitch Movement vs League Average
 if analysis_type == "Single Pitch Movement vs League Average":
     st.subheader("Single Pitch Movement vs League Average")
     selected_pitch = st.selectbox("Select the pitch type", df['pitch_type'].unique())
@@ -57,15 +49,16 @@ if analysis_type == "Single Pitch Movement vs League Average":
         st.warning("No data found for the selected pitcher.")
     else:
         avg_arm_angle = pitcher_data['arm_angle'].mean()
-        input_arm_angle = st.slider(
-            "Filter data by arm angle range (default ±3°):",
-            min_value=float(df['arm_angle'].min()),
-            max_value=float(df['arm_angle'].max()),
-            value=(avg_arm_angle - 3, avg_arm_angle + 3),
-        )
+        arm_angle_range = [avg_arm_angle - 3, avg_arm_angle + 3]
 
+        # Button to adjust range
+        if st.button("Adjust Arm Angle Range ±3°"):
+            arm_angle_range = [avg_arm_angle - 3, avg_arm_angle + 3]
+            st.info(f"Arm angle range adjusted to {arm_angle_range[0]:.2f}° to {arm_angle_range[1]:.2f}°.")
+
+        # Filter data based on arm angle range
         filtered_df = pitch_filtered_df[
-            (pitch_filtered_df['arm_angle'].between(input_arm_angle[0], input_arm_angle[1])) &
+            (pitch_filtered_df['arm_angle'].between(arm_angle_range[0], arm_angle_range[1])) &
             (pitch_filtered_df['p_throws'] == selected_handedness)
         ]
 
@@ -94,7 +87,7 @@ if analysis_type == "Single Pitch Movement vs League Average":
             )
             plt.axhline(0, color='black', linestyle='--', linewidth=1)
             plt.axvline(0, color='black', linestyle='--', linewidth=1)
-            plt.title(f"{selected_pitch} Heatmap | Arm Angle: {input_arm_angle[0]:.2f}° to {input_arm_angle[1]:.2f}°", fontsize=16)
+            plt.title(f"{selected_pitch} Heatmap | Arm Angle: {arm_angle_range[0]:.2f}° to {arm_angle_range[1]:.2f}°", fontsize=16)
             plt.xlabel("Horizontal Break (HB)", fontsize=14)
             plt.ylabel("Induced Vertical Break (iVB)", fontsize=14)
             plt.xlim(-30, 30)
@@ -102,14 +95,26 @@ if analysis_type == "Single Pitch Movement vs League Average":
             plt.legend()
             st.pyplot(plt)
 
+# Section: All Movements vs League Average
 elif analysis_type == "All Movements vs League Average":
     st.subheader("All Movements vs League Average")
-    pitcher_name = st.selectbox("Select a pitcher for comparison", ['Not enough data'] + df['player_name'].unique().tolist())
-    if pitcher_name == "Not enough data":
-        st.warning("No data available for the selected pitcher.")
-    else:
-        pitcher_df = df[df['player_name'] == pitcher_name]
-        league_data = df[df['p_throws'] == pitcher_df['p_throws'].iloc[0]]
+    pitcher_name = st.selectbox("Select a pitcher for comparison", df['player_name'].unique())
+    pitcher_df = df[df['player_name'] == pitcher_name]
+
+    if not pitcher_df.empty:
+        avg_arm_angle = pitcher_df['arm_angle'].mean()
+        arm_angle_range = [avg_arm_angle - 3, avg_arm_angle + 3]
+
+        # Button to adjust range
+        if st.button("Adjust Arm Angle Range ±3°"):
+            arm_angle_range = [avg_arm_angle - 3, avg_arm_angle + 3]
+            st.info(f"Arm angle range adjusted to {arm_angle_range[0]:.2f}° to {arm_angle_range[1]:.2f}°.")
+
+        league_data = df[
+            (df['p_throws'] == pitcher_df['p_throws'].iloc[0]) &
+            (df['arm_angle'].between(arm_angle_range[0], arm_angle_range[1]))
+        ]
+
         plt.figure(figsize=(10, 8))
         colormap_dict = {
             'Fastball': 'Reds',
@@ -148,7 +153,10 @@ elif analysis_type == "All Movements vs League Average":
         plt.ylabel("Induced Vertical Break (iVB)", fontsize=14)
         plt.xlim(-30, 30)
         plt.ylim(-30, 30)
+        plt.legend()
         st.pyplot(plt)
+    else:
+        st.warning("No data available for the selected pitcher.")
 
 import pandas as pd
 import seaborn as sns
