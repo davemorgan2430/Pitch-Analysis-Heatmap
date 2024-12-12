@@ -267,32 +267,46 @@ if not pitcher_df.empty:
     # Filter league data by handedness
     league_data = df[df['p_throws'] == pitcher_df['p_throws'].iloc[0]]
     
-    # Create a KDE heatmap for league averages
     plt.figure(figsize=(10, 8))
-    sns.kdeplot(
-        data=league_data,
-        x='HB',
-        y='iVB',
-        fill=True,
-        cmap='viridis',  # Heatmap color scheme
-        thresh=0.05,      # Minimum density for contours
-        levels=20,        # Number of contour levels
-        cbar=True,        # Show color bar
-        alpha=0.7,        # Transparency for the heatmap
-    )
     
-    # Plot the player's pitches as scatter points
+    # Define a colormap for each pitch type
+    colormap_dict = {
+        'Fastball': 'Reds',
+        'Slider': 'Blues',
+        'Changeup': 'Greens',
+        'Curveball': 'Purples',
+        # Add more mappings for other pitch types
+    }
+    
+    # Loop through each pitch type the player throws
     for pitch_type in pitcher_df['pitch_type'].unique():
+        # Filter league data for the current pitch type
+        pitch_league_data = league_data[league_data['pitch_type'] == pitch_type]
+        
+        # Create a KDE heatmap for the current pitch type
+        sns.kdeplot(
+            data=pitch_league_data,
+            x='HB',
+            y='iVB',
+            fill=True,
+            cmap=colormap_dict.get(pitch_type, 'viridis'),  # Default colormap if undefined
+            thresh=0.05,  # Minimum density for contours
+            levels=15,    # Number of contour levels
+            alpha=0.5,    # Transparency for overlays
+            label=f"{pitch_type} (League Avg)",
+        )
+        
+        # Add the player's average data point for this pitch type
         pitch_data = pitcher_df[pitcher_df['pitch_type'] == pitch_type]
         avg_hb = pitch_data['HB'].mean()
         avg_ivb = pitch_data['iVB'].mean()
         
-        # Add the player's data points with text annotations
-        plt.scatter(avg_hb, avg_ivb, color='blue', s=100, label=pitch_type)
+        # Scatter plot and text annotation for player's pitch data
+        plt.scatter(avg_hb, avg_ivb, color='black', s=100, edgecolor='white', label=f"{pitch_type} (Player)")
         plt.text(
             avg_hb, avg_ivb, pitch_type,
-            fontsize=12, color='black', ha='center', va='center', weight='bold',
-            bbox=dict(facecolor='white', edgecolor='blue', boxstyle='round,pad=0.3')
+            fontsize=10, color='black', ha='center', va='center', weight='bold',
+            bbox=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=0.3')
         )
     
     # Add lines at x=0 and y=0
@@ -306,8 +320,8 @@ if not pitcher_df.empty:
     plt.xlim(-30, 30)
     plt.ylim(-30, 30)
     
-    # Add legend for pitch types
-    plt.legend(title="Pitch Type")
+    # Add legend for clarity
+    plt.legend(title="Pitch Types")
     
     # Display the plot in Streamlit
     st.pyplot(plt)
