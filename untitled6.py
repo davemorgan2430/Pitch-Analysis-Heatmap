@@ -256,8 +256,6 @@ plt.legend()
 # Display the plot in Streamlit
 st.pyplot(plt)
 
-import plotly.express as px
-
 # Section: Pitcher Movements vs League Average
 st.header("Pitcher Movements vs League Average")
 pitcher_name = st.selectbox("Select a pitcher for comparison", df['player_name'].unique())
@@ -287,32 +285,42 @@ if not pitcher_df.empty:
     league_data_grouped['type'] = "League Average"
     combined_data = pd.concat([combined_data, league_data_grouped])
     
-    # Create an interactive scatter plot
-    fig = px.scatter(
-        combined_data,
-        x='HB',
-        y='iVB',
-        color='type',
-        symbol='type',
-        text='pitch_type',  # Hover text showing pitch type
-        labels={'HB': "Horizontal Break", 'iVB': "Induced Vertical Break"},
-        title=f"{pitcher_name} vs League Average Pitch Movement",
-        template="plotly_white"
+    # Separate player's data and league data
+    player_data = combined_data[combined_data['type'] == f"{pitcher_name}'s Pitch"]
+    league_data = combined_data[combined_data['type'] == "League Average"]
+    
+    # Create a scatter plot
+    plt.figure(figsize=(10, 8))
+    
+    # Plot player's pitches
+    plt.scatter(
+        player_data['HB'], player_data['iVB'], color='blue', label=f"{pitcher_name}'s Pitches", alpha=0.8
     )
+    for i, row in player_data.iterrows():
+        plt.text(row['HB'], row['iVB'], row['pitch_type'], fontsize=10, color='blue', ha='right', va='bottom')
     
-    # Customize marker size and text position
-    fig.update_traces(marker=dict(size=10), textposition="top center")
-    
-    # Add grid lines and enhance layout
-    fig.update_layout(
-        showlegend=True,
-        xaxis_title="Horizontal Break (HB)",
-        yaxis_title="Induced Vertical Break (iVB)",
-        xaxis=dict(showgrid=True),
-        yaxis=dict(showgrid=True),
+    # Plot league averages
+    plt.scatter(
+        league_data['HB'], league_data['iVB'], color='red', label="League Average", alpha=0.8
     )
+    for i, row in league_data.iterrows():
+        plt.text(row['HB'], row['iVB'], row['pitch_type'], fontsize=10, color='red', ha='left', va='top')
     
-    # Display the interactive plot in Streamlit
-    st.plotly_chart(fig, use_container_width=True)
+    # Add lines at x=0 and y=0
+    plt.axhline(0, color='black', linestyle='--', linewidth=1, label='y=0')  # Horizontal line
+    plt.axvline(0, color='black', linestyle='--', linewidth=1, label='x=0')  # Vertical line
+    
+    # Set plot labels and title
+    plt.title(f"{pitcher_name} vs League Average Pitch Movement", fontsize=16)
+    plt.xlabel("Horizontal Break (HB)", fontsize=14)
+    plt.ylabel("Induced Vertical Break (iVB)", fontsize=14)
+    plt.legend(loc="best")
+    
+    # Set x and y axis limits
+    plt.xlim(-30, 30)
+    plt.ylim(-30, 30)
+    
+    # Display the plot in Streamlit
+    st.pyplot(plt)
 else:
     st.warning("No data available for the selected pitcher.")
