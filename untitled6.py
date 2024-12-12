@@ -3,6 +3,8 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import streamlit as st
 
+st.title("Movement Plot Analysis")
+
 # Example to add a clickable link
 st.markdown("[Need Inspiration? Click here to sort and filter through 2024's best pitches via FanGraphs.](https://www.fangraphs.com/leaders/major-league?pos=all&stats=pit&lg=all&type=36&season=2024&month=0&season1=2024&ind=0&sortcol=3&sortdir=default&qual=20&pagenum=1)")
 
@@ -39,7 +41,7 @@ st.header("Pitch Analysis and Movement Comparison")
 # Dropdown menu for selecting analysis type
 analysis_type = st.selectbox(
     "Select Analysis Type",
-    ["Pitch Analysis Heatmap", "Pitcher Movements vs League Average"]
+    ["Single Pitch Movement vs League Average", "Pitcher Movements vs League Average"]
 )
 
 if analysis_type == "Pitch Analysis Heatmap":
