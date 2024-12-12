@@ -45,7 +45,6 @@ analysis_type = st.selectbox(
 )
 
 if analysis_type == "Single Pitch Movement vs League Average":
-    # Pitch Analysis Heatmap Code
     st.subheader("Single Pitch Movement vs League Average")
     selected_pitch = st.selectbox("Select the pitch type", df['pitch_type'].unique())
     pitch_filtered_df = df[df['pitch_type'] == selected_pitch]
@@ -58,32 +57,15 @@ if analysis_type == "Single Pitch Movement vs League Average":
         st.warning("No data found for the selected pitcher.")
     else:
         avg_arm_angle = pitcher_data['arm_angle'].mean()
-        avg_velocity = pitcher_data['release_speed'].mean()
-        avg_spin_rate = pitcher_data['release_spin_rate'].mean()
-        avg_woba = pitcher_data['estimated_woba_using_speedangle'].mean()
-        avg_extension = pitcher_data['release_extension'].mean()
-        avg_iVB = pitcher_data['iVB'].mean()
-        avg_HB = pitcher_data['HB'].mean()
-
-        st.sidebar.header(f"{selected_pitcher} - Pitch Stats")
-        st.sidebar.write(f"**Pitch Type:** {selected_pitch}")
-        st.sidebar.write(f"**Average Arm Angle:** {avg_arm_angle:.2f}°")
-        st.sidebar.write(f"**Average Velocity:** {avg_velocity:.1f} mph")
-        st.sidebar.write(f"**Average Spin Rate:** {avg_spin_rate:.1f} rpm")
-        st.sidebar.write(f"**Average wOBA:** {avg_woba:.3f}")
-        st.sidebar.write(f"**Average Extension:** {avg_extension:.2f} ft")
-        st.sidebar.write(f"**Average iVB:** {avg_iVB:.2f} in")
-        st.sidebar.write(f"**Average HB:** {avg_HB:.2f} in")
-
-        input_arm_angle = st.number_input(
-            "Enter an arm angle to filter the data (default is the pitcher's average):",
+        input_arm_angle = st.slider(
+            "Filter data by arm angle range (default ±3°):",
             min_value=float(df['arm_angle'].min()),
             max_value=float(df['arm_angle'].max()),
-            value=float(avg_arm_angle),
+            value=(avg_arm_angle - 3, avg_arm_angle + 3),
         )
 
         filtered_df = pitch_filtered_df[
-            (pitch_filtered_df['arm_angle'] == input_arm_angle) &
+            (pitch_filtered_df['arm_angle'].between(input_arm_angle[0], input_arm_angle[1])) &
             (pitch_filtered_df['p_throws'] == selected_handedness)
         ]
 
@@ -112,7 +94,7 @@ if analysis_type == "Single Pitch Movement vs League Average":
             )
             plt.axhline(0, color='black', linestyle='--', linewidth=1)
             plt.axvline(0, color='black', linestyle='--', linewidth=1)
-            plt.title(f"{selected_pitch} Heatmap | Arm Angle: {input_arm_angle:.2f}°", fontsize=16)
+            plt.title(f"{selected_pitch} Heatmap | Arm Angle: {input_arm_angle[0]:.2f}° to {input_arm_angle[1]:.2f}°", fontsize=16)
             plt.xlabel("Horizontal Break (HB)", fontsize=14)
             plt.ylabel("Induced Vertical Break (iVB)", fontsize=14)
             plt.xlim(-30, 30)
@@ -121,12 +103,12 @@ if analysis_type == "Single Pitch Movement vs League Average":
             st.pyplot(plt)
 
 elif analysis_type == "All Movements vs League Average":
-    # Pitcher Movements vs League Average Code
     st.subheader("All Movements vs League Average")
-    pitcher_name = st.selectbox("Select a pitcher for comparison", df['player_name'].unique())
-    pitcher_df = df[df['player_name'] == pitcher_name]
-
-    if not pitcher_df.empty:
+    pitcher_name = st.selectbox("Select a pitcher for comparison", ['Not enough data'] + df['player_name'].unique().tolist())
+    if pitcher_name == "Not enough data":
+        st.warning("No data available for the selected pitcher.")
+    else:
+        pitcher_df = df[df['player_name'] == pitcher_name]
         league_data = df[df['p_throws'] == pitcher_df['p_throws'].iloc[0]]
         plt.figure(figsize=(10, 8))
         colormap_dict = {
@@ -167,9 +149,6 @@ elif analysis_type == "All Movements vs League Average":
         plt.xlim(-30, 30)
         plt.ylim(-30, 30)
         st.pyplot(plt)
-    else:
-        st.warning("No data available for the selected pitcher.")
-
 
 import pandas as pd
 import seaborn as sns
