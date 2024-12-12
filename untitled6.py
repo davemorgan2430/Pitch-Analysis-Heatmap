@@ -166,7 +166,6 @@ elif analysis_type == "All Movements vs League Average":
         plt.ylabel("Induced Vertical Break (iVB)", fontsize=14)
         plt.xlim(-30, 30)
         plt.ylim(-30, 30)
-        plt.legend(title="Pitch Types")
         st.pyplot(plt)
     else:
         st.warning("No data available for the selected pitcher.")
