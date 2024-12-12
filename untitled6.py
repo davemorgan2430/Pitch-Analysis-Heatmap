@@ -41,7 +41,7 @@ st.header("Pitch Analysis and Movement Comparison")
 # Dropdown menu for selecting analysis type
 analysis_type = st.selectbox(
     "Select Analysis Type",
-    ["Single Pitch Movement vs League Average", "Pitcher Movements vs League Average"]
+    ["Single Pitch Movement vs League Average", "All Movements vs League Average"]
 )
 
 if analysis_type == "Single Pitch Movement vs League Average":
@@ -120,9 +120,9 @@ if analysis_type == "Single Pitch Movement vs League Average":
             plt.legend()
             st.pyplot(plt)
 
-elif analysis_type == "Pitcher Movements vs League Average":
+elif analysis_type == "All Movements vs League Average":
     # Pitcher Movements vs League Average Code
-    st.subheader("Pitcher Movements vs League Average")
+    st.subheader("All Movements vs League Average")
     pitcher_name = st.selectbox("Select a pitcher for comparison", df['player_name'].unique())
     pitcher_df = df[df['player_name'] == pitcher_name]
 
