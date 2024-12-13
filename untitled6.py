@@ -141,7 +141,6 @@ elif analysis_type == "All Movements vs League Average":
                 thresh=0.05,
                 levels=15,
                 alpha=0.5,
-                label=f"{pitch_type} (League Avg)",
             )
             pitch_data = pitcher_df[pitcher_df['pitch_type'] == pitch_type]
             avg_hb = pitch_data['HB'].mean()
