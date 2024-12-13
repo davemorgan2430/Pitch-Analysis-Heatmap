@@ -171,7 +171,7 @@ import matplotlib.pyplot as plt
 import streamlit as st
 
 # Section: Create a Pitcher with Combined Plot
-st.header("Create a Pitcher - Combined Plot for Multiple Pitches")
+st.header("Create a Pitcher")
 
 # Button to reset session state
 if st.button("Reset All Data"):
