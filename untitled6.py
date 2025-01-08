@@ -240,7 +240,7 @@ for pitch_type in set(pitch['pitch_type'] for pitch in st.session_state['user_pi
         fill=True,
         alpha=0.5,
         label=f"League Avg {pitch_type}",
-        cmap='coolwarm',
+        cmap='viridis',
         levels=15,
         linewidths=1.5,
     )
