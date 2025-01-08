@@ -238,23 +238,39 @@ for pitch_type in set(pitch['pitch_type'] for pitch in st.session_state['user_pi
         x='HB',
         y='iVB',
         fill=True,
-        cmap='viridis',
         alpha=0.5,
-        thresh=0.05,
-        levels=10,
-        label=f"League Avg {pitch_type}"
+        label=f"League Avg {pitch_type}",
+        cmap='coolwarm',
+        levels=15,
+        linewidths=1.5,
     )
 
-# Overlay user-defined pitches on the same plot
-for pitch in st.session_state['user_pitches']:
-    plt.scatter(
-        pitch['HB'],
-        pitch['iVB'],
-        color='orange',
-        label=f"{pitch['pitch_type']} (iVB={pitch['iVB']:.2f}, HB={pitch['HB']:.2f})",
-        s=100,  # Marker size
-        alpha=1.0  # Transparency
-    )
+# Overlay user-defined pitches with KDE and labels
+user_data = pd.DataFrame(st.session_state['user_pitches'])
+if not user_data.empty:
+    for pitch_type in user_data['pitch_type'].unique():
+        user_pitch_data = user_data[user_data['pitch_type'] == pitch_type]
+
+        # Add KDE for user pitches
+        sns.kdeplot(
+            data=user_pitch_data,
+            x='HB',
+            y='iVB',
+            fill=True,
+            alpha=0.6,
+            cmap='viridis',
+            label=f"User {pitch_type}",
+            levels=15,
+            linewidths=1.5,
+        )
+
+        # Add pitch type label
+        for _, row in user_pitch_data.iterrows():
+            plt.text(
+                row['HB'], row['iVB'], row['pitch_type'],
+                fontsize=10, color='black', fontweight='bold',
+                bbox=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=0.3')
+            )
 
 # Add lines at x=0 and y=0
 plt.axhline(0, color='black', linestyle='--', linewidth=1, label='y=0')
