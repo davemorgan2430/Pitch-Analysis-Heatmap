@@ -329,8 +329,8 @@ else:
     # Plot the zone heatmap using the pitch location data (assuming you have 'zone_x' and 'zone_y' columns)
     sns.kdeplot(
         data=pitch_type_data,
-        x='zone_x',  # Replace with the appropriate column for x-axis (horizontal zone location)
-        y='zone_y',  # Replace with the appropriate column for y-axis (vertical zone location)
+        x='plate_x',  # Replace with the appropriate column for x-axis (horizontal zone location)
+        y='plate_z',  # Replace with the appropriate column for y-axis (vertical zone location)
         fill=True,
         cmap='coolwarm',
         thresh=0.1,
