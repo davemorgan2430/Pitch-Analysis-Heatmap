@@ -294,7 +294,56 @@ st.pyplot(plt)
 
 
 import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+import streamlit as st
 
+# Function to load the zone data
 @st.cache_data
 def load_zone_data():
+    # Replace with the path to your "zone" CSV file
     return pd.read_csv("zone_data.csv")
+
+# Section: Zone Heatmap for Pitcher
+st.header("Pitcher Zone Heatmap")
+
+# Load the zone data from your CSV
+zone_df = load_zone_data()
+
+# Dropdown to select a pitcher
+pitcher_name = st.selectbox("Select a pitcher for zone heatmap", zone_df['player_name'].unique())
+
+# Filter the zone data based on the selected pitcher
+pitcher_zone_data = zone_df[zone_df['player_name'] == pitcher_name]
+
+if pitcher_zone_data.empty:
+    st.warning(f"No zone data found for pitcher: {pitcher_name}")
+else:
+    # Optional: Allow the user to select a specific pitch type for the heatmap
+    selected_pitch_type = st.selectbox("Select pitch type", pitcher_zone_data['pitch_type'].unique())
+    pitch_type_data = pitcher_zone_data[pitcher_zone_data['pitch_type'] == selected_pitch_type]
+    
+    # Create the heatmap
+    plt.figure(figsize=(8, 8))
+    
+    # Plot the zone heatmap using the pitch location data (assuming you have 'zone_x' and 'zone_y' columns)
+    sns.kdeplot(
+        data=pitch_type_data,
+        x='zone_x',  # Replace with the appropriate column for x-axis (horizontal zone location)
+        y='zone_y',  # Replace with the appropriate column for y-axis (vertical zone location)
+        fill=True,
+        cmap='coolwarm',
+        thresh=0.1,
+        levels=15
+    )
+    
+    # Title and labels
+    plt.title(f"Pitch Zone Heatmap for {pitcher_name} ({selected_pitch_type})", fontsize=16)
+    plt.xlabel("Horizontal Zone Location", fontsize=14)
+    plt.ylabel("Vertical Zone Location", fontsize=14)
+    plt.xlim(-30, 30)  # You can adjust these limits based on your data
+    plt.ylim(0, 30)    # Adjust this as needed
+    plt.colorbar()
+    
+    # Display the heatmap
+    st.pyplot(plt)
