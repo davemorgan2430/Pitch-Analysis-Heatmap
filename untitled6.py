@@ -222,7 +222,7 @@ if st.session_state['user_pitches']:
         st.write(f"- {pitch['pitch_type']}: iVB={pitch['iVB']:.2f}, HB={pitch['HB']:.2f}")
 
 # Step 5: Create a combined heatmap
-st.write("### Combined Heatmap")
+st.write("### Heatmap vs League Average")
 plt.figure(figsize=(12, 10))
 
 # Loop through each unique pitch type in the added pitches
