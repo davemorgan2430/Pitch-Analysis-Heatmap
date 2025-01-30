@@ -326,11 +326,11 @@ else:
     # Create the heatmap
     plt.figure(figsize=(8, 8))
     
-    # Plot the zone heatmap using the pitch location data (assuming you have 'zone_x' and 'zone_y' columns)
+    # Plot the zone heatmap using the pitch location data (plate_x for horizontal, plate_z for vertical)
     sns.kdeplot(
         data=pitch_type_data,
-        x='plate_x',  # Replace with the appropriate column for x-axis (horizontal zone location)
-        y='plate_z',  # Replace with the appropriate column for y-axis (vertical zone location)
+        x='plate_x',  # Horizontal zone location
+        y='plate_z',  # Vertical zone location
         fill=True,
         cmap='coolwarm',
         thresh=0.1,
@@ -339,11 +339,14 @@ else:
     
     # Title and labels
     plt.title(f"Pitch Zone Heatmap for {pitcher_name} ({selected_pitch_type})", fontsize=16)
-    plt.xlabel("Horizontal Zone Location", fontsize=14)
-    plt.ylabel("Vertical Zone Location", fontsize=14)
-    plt.xlim(-30, 30)  # You can adjust these limits based on your data
-    plt.ylim(0, 30)    # Adjust this as needed
-    plt.colorbar()
+    plt.xlabel("Horizontal Zone Location (plate_x)", fontsize=14)
+    plt.ylabel("Vertical Zone Location (plate_z)", fontsize=14)
+    
+    # Set the axis limits based on the provided coordinates
+    plt.xlim(-0.83, 0.83)  # Horizontal zone limits
+    plt.ylim(1.17, 3.92)   # Vertical zone limits
+    
+    plt.colorbar()  # Color bar for reference
     
     # Display the heatmap
     st.pyplot(plt)
