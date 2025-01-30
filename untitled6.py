@@ -293,15 +293,28 @@ plt.legend()
 st.pyplot(plt)
 
 
-# Input the Google Drive file ID
-file_id = "1HHUgH9VK484dgUkX0Ryos7bM8pnukCcJ/"  # Replace with your Google Drive file ID
-url = f"https://drive.google.com/uc?id={file_id}"
+import pandas as pd
+import streamlit as st
+import requests
+from io import StringIO
 
-# Load the CSV file into a DataFrame
+# Input the Google Drive file ID
+file_id = "1HHUgH9VK484dgUkX0Ryos7bM8pnukCcJ"  # Replace with your Google Drive file ID
+url = f"https://drive.google.com/uc?export=download&id={file_id}"
+
+# Request the file from Google Drive
 try:
-    df1 = pd.read_csv(url)
-    st.write("Data loaded successfully!")
-except Exception as e:
+    response = requests.get(url)
+    response.raise_for_status()  # Will raise an error if the file isn't found or downloaded correctly
+
+    # Read the content of the file into a pandas DataFrame
+    data = StringIO(response.text)
+    zone_df = pd.read_csv(data)
+
+    st.write("Zone Data loaded successfully!")
+    st.write(zone_df.head())  # Display the first few rows of the DataFrame
+
+except requests.exceptions.RequestException as e:
     st.error("Error loading the file. Please check the file ID or format.")
     st.error(e)
     st.stop()
