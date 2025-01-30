@@ -43,7 +43,7 @@ st.header("Pitch Analysis and Movement Comparison")
 # Dropdown menu for selecting analysis type
 analysis_type = st.selectbox(
     "Select Analysis Type",
-    ["Single Pitch Movement vs League Average", "All Movements vs League Average"]
+    ["All Movements vs League Average", "Single Pitch Movement vs League Average"]
 )
 
 if analysis_type == "Single Pitch Movement vs League Average":
