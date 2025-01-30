@@ -295,9 +295,6 @@ st.pyplot(plt)
 
 import pandas as pd
 
-# Load the `zone` dataset
-@st.cache
+@st.cache_data
 def load_zone_data():
     return pd.read_csv("zone_data.csv")
-
-zone = load_zone_data()
