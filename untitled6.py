@@ -5,6 +5,28 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import streamlit as st
 
+# List of required columns for the app to work
+required_columns = [
+    'pitch_type', 'player_name', 'arm_angle', 'HB', 'iVB', 
+    'p_throws', 'release_speed', 'release_spin_rate', 
+    'estimated_woba_using_speedangle', 'release_extension', 'release_pos_z', 
+    'plate_x', 'plate_z'  # Location columns for strike zone heatmaps
+]
+
+# Check if all required columns are present
+missing_columns = [col for col in required_columns if col not in df.columns]
+
+if missing_columns:
+    st.error(
+        f"The uploaded file is missing the following required columns: {', '.join(missing_columns)}. "
+        "Please ensure the dataset contains these columns and try again."
+    )
+    st.stop()
+else:
+    st.success("All required columns are present!")
+
+
+
 st.title("Movement Plot Analysis")
 
 # Example to add a clickable link
