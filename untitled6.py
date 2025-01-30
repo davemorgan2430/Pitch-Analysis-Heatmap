@@ -291,3 +291,6 @@ plt.legend()
 
 # Display the plot in Streamlit
 st.pyplot(plt)
+
+
+st.write(st.session_state['user_pitches'])  # Check the data structure
