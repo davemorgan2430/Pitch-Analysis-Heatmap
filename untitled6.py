@@ -294,59 +294,27 @@ st.pyplot(plt)
 
 
 import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
 import streamlit as st
+import requests
+from io import StringIO
 
-# Function to load the zone data
-@st.cache_data
-def load_zone_data():
-    # Replace with the path to your "zone" CSV file
-    return pd.read_csv("zone_data.csv")
+# Input the Google Drive file ID
+file_id = "1HHUgH9VK484dgUkX0Ryos7bM8pnukCcJ"  # Replace with your Google Drive file ID
+url = f"https://drive.google.com/uc?export=download&id={file_id}"
 
-# Section: Zone Heatmap for Pitcher
-st.header("Pitcher Zone Heatmap")
+# Request the file from Google Drive
+try:
+    response = requests.get(url)
+    response.raise_for_status()  # Will raise an error if the file isn't found or downloaded correctly
 
-# Load the zone data from your CSV
-zone_df = load_zone_data()
+    # Read the content of the file into a pandas DataFrame
+    data = StringIO(response.text)
+    df = pd.read_csv(data)
 
-# Dropdown to select a pitcher
-pitcher_name = st.selectbox("Select a pitcher for zone heatmap", zone_df['player_name'].unique())
+    st.write("Data loaded successfully!")
+    st.write(df.head())  # Display the first few rows of the DataFrame
 
-# Filter the zone data based on the selected pitcher
-pitcher_zone_data = zone_df[zone_df['player_name'] == pitcher_name]
-
-if pitcher_zone_data.empty:
-    st.warning(f"No zone data found for pitcher: {pitcher_name}")
-else:
-    # Optional: Allow the user to select a specific pitch type for the heatmap
-    selected_pitch_type = st.selectbox("Select pitch type", pitcher_zone_data['pitch_type'].unique())
-    pitch_type_data = pitcher_zone_data[pitcher_zone_data['pitch_type'] == selected_pitch_type]
-    
-    # Create the heatmap
-    plt.figure(figsize=(8, 8))
-    
-    # Plot the zone heatmap using the pitch location data (plate_x for horizontal, plate_z for vertical)
-    sns.kdeplot(
-        data=pitch_type_data,
-        x='plate_x',  # Horizontal zone location
-        y='plate_z',  # Vertical zone location
-        fill=True,
-        cmap='coolwarm',
-        thresh=0.1,
-        levels=15
-    )
-    
-    # Title and labels
-    plt.title(f"Pitch Zone Heatmap for {pitcher_name} ({selected_pitch_type})", fontsize=16)
-    plt.xlabel("Horizontal Zone Location (plate_x)", fontsize=14)
-    plt.ylabel("Vertical Zone Location (plate_z)", fontsize=14)
-    
-    # Set the axis limits based on the provided coordinates
-    plt.xlim(-0.83, 0.83)  # Horizontal zone limits
-    plt.ylim(1.17, 3.92)   # Vertical zone limits
-    
-    plt.colorbar()  # Color bar for reference
-    
-    # Display the heatmap
-    st.pyplot(plt)
+except requests.exceptions.RequestException as e:
+    st.error("Error loading the file. Please check the file ID or format.")
+    st.error(e)
+    st.stop()
