@@ -1,5 +1,3 @@
-# Code for my Streamlit App. The app can be found at https://pitch-analysis-heatmap.streamlit.app/
-
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -166,11 +164,6 @@ elif analysis_type == "All Movements vs League Average":
     else:
         st.warning("No data available for the selected pitcher.")
 
-import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
-import streamlit as st
-
 # Section: Create a Pitcher with Combined Plot
 st.header("Create a Pitcher")
 
@@ -197,97 +190,35 @@ if league_filtered.empty:
     st.warning("No league data found for the specified criteria.")
     st.stop()
 
-# Step 3: Add pitches with type, iVB, and HB
-if 'user_pitches' not in st.session_state:
-    st.session_state['user_pitches'] = []
+# Step 3: Add Pitch to User Pitches
+selected_pitch_type = st.selectbox("Select pitch type to add:", league_filtered['pitch_type'].unique())
 
-st.subheader("Add Pitches")
-pitch_type = st.selectbox("Select pitch type:", df['pitch_type'].unique())
-iVB = st.number_input(f"Enter {pitch_type} iVB (inches):")
-HB = st.number_input(f"Enter {pitch_type} HB (inches):")
+if selected_pitch_type:
+    selected_pitch_data = league_filtered[league_filtered['pitch_type'] == selected_pitch_type]
+    user_pitch = {
+        "pitch_type": selected_pitch_type,
+        "avg_HB": selected_pitch_data['HB'].mean(),
+        "avg_iVB": selected_pitch_data['iVB'].mean()
+    }
 
-# Button to add the pitch
-if st.button("Add Pitch"):
-    st.session_state['user_pitches'].append({
-        'pitch_type': pitch_type,
-        'iVB': iVB,
-        'HB': HB
-    })
-    st.success(f"Added {pitch_type} with iVB={iVB:.2f} and HB={HB:.2f}")
+    # Add to the list of user pitches in session state
+    if 'user_pitches' not in st.session_state:
+        st.session_state['user_pitches'] = []
 
-# Step 4: Show all added pitches
+    st.session_state['user_pitches'].append(user_pitch)
+
+# Step 4: Plot Combined Pitcher
 if st.session_state['user_pitches']:
-    st.write("### Added Pitches:")
-    for pitch in st.session_state['user_pitches']:
-        st.write(f"- {pitch['pitch_type']}: iVB={pitch['iVB']:.2f}, HB={pitch['HB']:.2f}")
+    user_pitch_df = pd.DataFrame(st.session_state['user_pitches'])
+    plt.figure(figsize=(10, 8))
 
-# Step 5: Create a combined heatmap
-st.write("### Heatmap vs League Average")
-plt.figure(figsize=(12, 10))
+    for _, row in user_pitch_df.iterrows():
+        plt.scatter(row['avg_HB'], row['avg_iVB'], label=row['pitch_type'], s=100, edgecolor='black')
 
-# Loop through each unique pitch type in the added pitches
-for pitch_type in set(pitch['pitch_type'] for pitch in st.session_state['user_pitches']):
-    # Filter league data for this pitch type
-    league_pitch_filtered = league_filtered[league_filtered['pitch_type'] == pitch_type]
-    
-    if league_pitch_filtered.empty:
-        st.warning(f"No league data found for pitch type {pitch_type}.")
-        continue
-
-    # Overlay league average data for this pitch type
-    sns.kdeplot(
-        data=league_pitch_filtered,
-        x='HB',
-        y='iVB',
-        fill=True,
-        alpha=0.5,
-        label=f"League Avg {pitch_type}",
-        cmap='viridis',
-        levels=15,
-        linewidths=1.5,
-    )
-
-# Overlay user-defined pitches with KDE and labels
-user_data = pd.DataFrame(st.session_state['user_pitches'])
-if not user_data.empty:
-    for pitch_type in user_data['pitch_type'].unique():
-        user_pitch_data = user_data[user_data['pitch_type'] == pitch_type]
-
-        # Add KDE for user pitches
-        sns.kdeplot(
-            data=user_pitch_data,
-            x='HB',
-            y='iVB',
-            fill=True,
-            alpha=0.6,
-            cmap='viridis',
-            label=f"User {pitch_type}",
-            levels=15,
-            linewidths=1.5,
-        )
-
-        # Add pitch type label
-        for _, row in user_pitch_data.iterrows():
-            plt.text(
-                row['HB'], row['iVB'], row['pitch_type'],
-                fontsize=10, color='black', fontweight='bold',
-                bbox=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=0.3')
-            )
-
-# Add lines at x=0 and y=0
-plt.axhline(0, color='black', linestyle='--', linewidth=1, label='y=0')
-plt.axvline(0, color='black', linestyle='--', linewidth=1, label='x=0')
-
-# Set labels, title, and legend
-plt.title(
-    f"Movement Heatmap for User-Defined Pitches | Arm Angle: {min_arm_angle}° to {max_arm_angle}°",
-    fontsize=16
-)
-plt.xlabel("Horizontal Break (HB)", fontsize=14)
-plt.ylabel("Induced Vertical Break (iVB)", fontsize=14)
-plt.xlim(-30, 30)
-plt.ylim(-30, 30)
-plt.legend()
-
-# Display the plot in Streamlit
-st.pyplot(plt)
+    plt.title("Combined Pitcher Analysis", fontsize=16)
+    plt.xlabel("Horizontal Break (HB)", fontsize=14)
+    plt.ylabel("Induced Vertical Break (iVB)", fontsize=14)
+    plt.xlim(-30, 30)
+    plt.ylim(-30, 30)
+    plt.legend()
+    st.pyplot(plt)
