@@ -37,10 +37,6 @@ if not all(col in df.columns for col in required_columns):
     )
     st.stop()
 
-# Display all columns in the dataset
-st.write("Columns in the dataset:")
-st.write(list(df.columns))
-
 # Section: Combined Analysis
 st.header("Pitch Analysis and Movement Comparison")
 
