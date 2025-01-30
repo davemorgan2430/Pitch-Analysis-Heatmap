@@ -291,3 +291,13 @@ plt.legend()
 
 # Display the plot in Streamlit
 st.pyplot(plt)
+
+
+import pandas as pd
+
+# Load the `zone` dataset
+@st.cache
+def load_zone_data():
+    return pd.read_csv("zone_data.csv")
+
+zone = load_zone_data()
