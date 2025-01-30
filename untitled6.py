@@ -1,3 +1,5 @@
+# Code for my Streamlit App. The app can be found at https://pitch-analysis-heatmap.streamlit.app/
+
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -41,7 +43,7 @@ st.header("Pitch Analysis and Movement Comparison")
 # Dropdown menu for selecting analysis type
 analysis_type = st.selectbox(
     "Select Analysis Type",
-    ["Single Pitch Movement vs League Average", "All Movements vs League Average"]
+    ["All Movements vs League Average", "Single Pitch Movement vs League Average"]
 )
 
 if analysis_type == "Single Pitch Movement vs League Average":
@@ -220,7 +222,7 @@ if st.session_state['user_pitches']:
         st.write(f"- {pitch['pitch_type']}: iVB={pitch['iVB']:.2f}, HB={pitch['HB']:.2f}")
 
 # Step 5: Create a combined heatmap
-st.write("### Combined Heatmap")
+st.write("### Heatmap vs League Average")
 plt.figure(figsize=(12, 10))
 
 # Loop through each unique pitch type in the added pitches
@@ -240,7 +242,7 @@ for pitch_type in set(pitch['pitch_type'] for pitch in st.session_state['user_pi
         fill=True,
         alpha=0.5,
         label=f"League Avg {pitch_type}",
-        cmap='coolwarm',
+        cmap='viridis',
         levels=15,
         linewidths=1.5,
     )
